@@ -1,0 +1,16 @@
+# MoonBit build output
+target/
+.moon/
+_build/
+dist/
+site/
+
+# Local workspace artifacts
+work/
+outputs/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
