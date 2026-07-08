@@ -1,8 +1,11 @@
+///|
 fn main {
   let args = @env.args()
   let command = find_command(args)
   if command == "build" {
     run_build(args)
+  } else if command == "dev" {
+    run_dev(args)
   } else if command == "clean" {
     run_clean(args)
   } else if command == "version" || command == "--version" || command == "-V" {
@@ -12,6 +15,7 @@ fn main {
   }
 }
 
+///|
 fn find_command(args : Array[String]) -> String {
   for arg in args {
     if arg == "help" || arg == "--help" || arg == "-h" {
@@ -20,6 +24,8 @@ fn find_command(args : Array[String]) -> String {
       return "version"
     } else if arg == "build" {
       return "build"
+    } else if arg == "dev" {
+      return "dev"
     } else if arg == "clean" {
       return "clean"
     }
@@ -27,6 +33,7 @@ fn find_command(args : Array[String]) -> String {
   "build"
 }
 
+///|
 fn run_build(args : Array[String]) -> Unit {
   let docs_dir = find_build_input(args)
   let out_dir = find_option(args, "--out", "dist")
@@ -34,11 +41,7 @@ fn run_build(args : Array[String]) -> Unit {
   let sources = load_sources(docs_dir)
   let en_result = @core.build_site_for_lang(
     sources,
-    {
-      title: "MoonPress",
-      description: "MoonBit documentation site",
-      base_url,
-    },
+    { title: "MoonPress", description: "MoonBit documentation site", base_url },
     "en",
   )
   let zh_result = @core.build_site_for_lang(
@@ -62,6 +65,15 @@ fn run_build(args : Array[String]) -> Unit {
   println("copy " + docs_dir + "/assets -> " + out_dir + "/zh/assets")
 }
 
+///|
+fn run_dev(args : Array[String]) -> Unit {
+  run_build(args)
+  let out_dir = find_option(args, "--out", "dist")
+  let port = parse_port(find_option(args, "--port", "8080"))
+  start_preview(out_dir, port)
+}
+
+///|
 fn join_base_url(base_url : String, segment : String) -> String {
   if base_url == "" || base_url == "/" {
     "/" + segment + "/"
@@ -72,12 +84,31 @@ fn join_base_url(base_url : String, segment : String) -> String {
   }
 }
 
+///|
 fn run_clean(args : Array[String]) -> Unit {
   let out_dir = find_option(args, "--out", "dist")
   clean_output_dir(out_dir)
   println("cleaned " + out_dir)
 }
 
+///|
+fn parse_port(value : String) -> Int {
+  let mut result = 0
+  for ch in value {
+    if ch >= '0' && ch <= '9' {
+      result = result * 10 + (ch.to_int() - '0'.to_int())
+    } else {
+      return 8080
+    }
+  }
+  if result == 0 {
+    8080
+  } else {
+    result
+  }
+}
+
+///|
 fn find_build_input(args : Array[String]) -> String {
   let mut seen_build = false
   for arg in args {
@@ -91,7 +122,12 @@ fn find_build_input(args : Array[String]) -> String {
   "docs"
 }
 
-fn find_option(args : Array[String], name : String, fallback : String) -> String {
+///|
+fn find_option(
+  args : Array[String],
+  name : String,
+  fallback : String,
+) -> String {
   for i = 0; i < args.length(); i = i + 1 {
     if args[i] == name && i + 1 < args.length() {
       return args[i + 1]
@@ -104,10 +140,12 @@ fn find_option(args : Array[String], name : String, fallback : String) -> String
   fallback
 }
 
+///|
 fn print_help() -> Unit {
   println("moonpress " + @core.version())
   println("Usage:")
   println("  moonpress build [docs-dir] --out dist --base-url /")
+  println("  moonpress dev [docs-dir] --out dist --port 8080")
   println("  moonpress clean --out dist")
   println("  moonpress version")
 }

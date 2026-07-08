@@ -1,0 +1,164 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "hua1104/moonpress"
+
+// Values
+pub fn build_manifest(BuildResult) -> String
+
+pub fn build_search_index(Array[PagePlan], Array[PageSource]) -> String
+
+pub fn build_site(Array[PageSource]) -> BuildResult
+
+pub fn build_site_for_lang(Array[PageSource], SiteConfig, String) -> BuildResult
+
+pub fn build_site_with_config(Array[PageSource], SiteConfig) -> BuildResult
+
+pub fn build_sitemap(Array[PagePlan], String) -> String
+
+pub fn collect_pages(Array[PageSource]) -> Array[PagePlan]
+
+pub fn collect_pages_for_lang(Array[PageSource], String) -> Array[PagePlan]
+
+pub fn compact_text(String) -> String
+
+pub fn default_config() -> SiteConfig
+
+pub fn default_stylesheet() -> String
+
+pub fn empty_front_matter() -> FrontMatter
+
+pub fn escape_html(String) -> String
+
+pub fn escape_json(String) -> String
+
+pub fn has_front_matter(String) -> Bool
+
+pub fn localized_href(String, String) -> String
+
+pub fn merge_build_results(Array[BuildResult]) -> BuildResult
+
+pub fn navigation_from_pages(Array[PagePlan]) -> Array[NavItem]
+
+pub fn normalize_route(String) -> String
+
+pub fn page_shell(String, String) -> String
+
+pub fn page_shell_with_navigation(String, String, String) -> String
+
+pub fn page_shell_with_navigation_and_footer(String, String, String, String, String) -> String
+
+pub fn plan_page(String, String) -> PagePlan
+
+pub fn read_description(String) -> String
+
+pub fn read_draft(String) -> Bool
+
+pub fn read_lang(String) -> String
+
+pub fn read_order(String) -> Int
+
+pub fn read_title(String) -> String
+
+pub fn render_document(String, String) -> RenderedPage
+
+pub fn render_inline(String) -> String
+
+pub fn render_language_switcher(String, String) -> String
+
+pub fn render_markdown(String) -> String
+
+pub fn render_page(String, String) -> String
+
+pub fn render_page_with_chrome(String, String, String, String, String) -> String
+
+pub fn render_page_with_navigation(String, String, String) -> String
+
+pub fn render_pager(Array[PagePlan], Int) -> String
+
+pub fn render_pager_for_lang(Array[PagePlan], Int, String) -> String
+
+pub fn render_sidebar(Array[NavItem]) -> String
+
+pub fn render_sidebar_for_lang(Array[NavItem], String) -> String
+
+pub fn route_depth(String) -> Int
+
+pub fn route_to_output_path(String) -> String
+
+pub fn search_entry_json(SearchEntry) -> String
+
+pub fn strip_front_matter(String) -> String
+
+pub fn version() -> String
+
+// Errors
+
+// Types and methods
+pub(all) struct BuildResult {
+  files : Array[OutputFile]
+  page_count : Int
+}
+
+pub(all) struct Document {
+  source_path : String
+  route : String
+  front_matter : FrontMatter
+  body : String
+}
+
+pub(all) struct FrontMatter {
+  title : String
+  description : String
+  order : Int
+  draft : Bool
+}
+
+pub(all) struct NavItem {
+  title : String
+  route : String
+  depth : Int
+}
+
+pub(all) struct OutputFile {
+  path : String
+  content : String
+}
+
+pub(all) struct PagePlan {
+  source_path : String
+  route : String
+  output_path : String
+  title : String
+  description : String
+  order : Int
+  lang : String
+  draft : Bool
+}
+
+pub(all) struct PageSource {
+  path : String
+  source : String
+}
+
+pub(all) struct RenderedPage {
+  route : String
+  title : String
+  html : String
+}
+
+pub(all) struct SearchEntry {
+  title : String
+  route : String
+  description : String
+  text : String
+}
+
+pub(all) struct SiteConfig {
+  title : String
+  description : String
+  base_url : String
+}
+
+// Type aliases
+
+// Traits
+

@@ -1,0 +1,8 @@
+import {
+  "hua1104/moonpress" @core,
+  "moonbitlang/core/env",
+}
+
+options(
+  "is-main": true,
+)

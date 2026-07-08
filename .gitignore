@@ -8,6 +8,8 @@ site/
 # Local workspace artifacts
 work/
 outputs/
+moonpress-application.md
+新建 文本文档.txt
 
 # OS/editor noise
 .DS_Store

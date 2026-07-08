@@ -1,3 +1,4 @@
+///|
 pub fn escape_html(input : String) -> String {
   input
   .replace_all(old="&", new="&amp;")
@@ -6,10 +7,12 @@ pub fn escape_html(input : String) -> String {
   .replace_all(old="\"", new="&quot;")
 }
 
+///|
 pub fn render_inline(input : String) -> String {
   render_links(render_inline_code(input))
 }
 
+///|
 fn render_inline_code(input : String) -> String {
   match input.find("`") {
     Some(start) => {
@@ -18,7 +21,9 @@ fn render_inline_code(input : String) -> String {
         Some(end_rel) => {
           let end = start + 1 + end_rel
           escape_html(input[:start].to_owned()) +
-          "<code>" + escape_html(input[start + 1:end].to_owned()) + "</code>" +
+          "<code>" +
+          escape_html(input[start + 1:end].to_owned()) +
+          "</code>" +
           render_inline_code(input[end + 1:].to_owned())
         }
         None => escape_html(input)
@@ -28,6 +33,7 @@ fn render_inline_code(input : String) -> String {
   }
 }
 
+///|
 fn render_links(input : String) -> String {
   match input.find("[") {
     Some(start) => {
@@ -40,8 +46,11 @@ fn render_links(input : String) -> String {
             Some(end_rel) => {
               let end = close + 2 + end_rel
               input[:start].to_owned() +
-              "<a href=\"" + escape_html(input[close + 2:end].to_owned()) + "\">" +
-              input[start + 1:close].to_owned() + "</a>" +
+              "<a href=\"" +
+              escape_html(input[close + 2:end].to_owned()) +
+              "\">" +
+              input[start + 1:close].to_owned() +
+              "</a>" +
               render_links(input[end + 1:].to_owned())
             }
             None => input
@@ -54,6 +63,7 @@ fn render_links(input : String) -> String {
   }
 }
 
+///|
 pub fn render_markdown(input : String) -> String {
   let mut html = ""
   let lines = input.split("\n")

@@ -1,13 +1,8 @@
+///|
 test "build site renders pages and default asset" {
   let result = build_site([
-    {
-      path: "index.md",
-      source: "---\ntitle: Home\n---\n# Home\nWelcome.",
-    },
-    {
-      path: "guide/start.md",
-      source: "# Start",
-    },
+    { path: "index.md", source: "---\ntitle: Home\n---\n# Home\nWelcome." },
+    { path: "guide/start.md", source: "# Start" },
   ])
   inspect(result.page_count, content="2")
   inspect(result.files.length(), content="6")
@@ -19,25 +14,19 @@ test "build site renders pages and default asset" {
   inspect(result.files[5].path, content="moonpress-manifest.txt")
 }
 
+///|
 test "build site skips draft pages" {
   let result = build_site([
-    {
-      path: "draft.md",
-      source: "---\ntitle: Draft\ndraft: true\n---\n# Draft",
-    },
+    { path: "draft.md", source: "---\ntitle: Draft\ndraft: true\n---\n# Draft" },
   ])
   inspect(result.page_count, content="0")
   inspect(result.files.length(), content="4")
 }
 
+///|
 test "build site uses config base url for sitemap" {
   let result = build_site_with_config(
-    [
-      {
-        path: "index.md",
-        source: "# Home",
-      },
-    ],
+    [{ path: "index.md", source: "# Home" }],
     {
       title: "Docs",
       description: "Docs",
@@ -52,6 +41,7 @@ test "build site uses config base url for sitemap" {
   )
 }
 
+///|
 test "build site for zh writes localized output paths" {
   let result = build_site_for_lang(
     [
@@ -66,9 +56,13 @@ test "build site for zh writes localized output paths" {
   inspect(result.page_count, content="1")
   inspect(result.files[0].path, content="zh/index.html")
   inspect(result.files[0].content.find("中文") is Some(_), content="true")
-  inspect(result.files[0].content.find("href=\"/zh/\"") is Some(_), content="true")
+  inspect(
+    result.files[0].content.find("href=\"/zh/\"") is Some(_),
+    content="true",
+  )
 }
 
+///|
 test "merge build results sums pages and files" {
   let merged = merge_build_results([
     { page_count: 1, files: [{ path: "index.html", content: "" }] },

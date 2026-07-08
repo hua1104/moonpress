@@ -1,3 +1,4 @@
+///|
 pub fn normalize_route(path : String) -> String {
   let mut route = path.replace_all(old="\\", new="/")
   if route.has_suffix(".md") {
@@ -17,6 +18,7 @@ pub fn normalize_route(path : String) -> String {
   }
 }
 
+///|
 pub fn route_to_output_path(route : String) -> String {
   if route == "/" {
     "index.html"

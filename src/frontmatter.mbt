@@ -1,7 +1,9 @@
+///|
 pub fn has_front_matter(input : String) -> Bool {
   input.length() >= 4 && input[:3] == "---"
 }
 
+///|
 pub fn strip_front_matter(input : String) -> String {
   if has_front_matter(input) {
     let marker = "\n---\n"
@@ -14,6 +16,7 @@ pub fn strip_front_matter(input : String) -> String {
   }
 }
 
+///|
 pub fn read_title(input : String) -> String {
   let title = read_front_matter_value(input, "title")
   if title != "" {
@@ -24,23 +27,32 @@ pub fn read_title(input : String) -> String {
   }
 }
 
+///|
 pub fn read_description(input : String) -> String {
   read_front_matter_value(input, "description")
 }
 
+///|
 pub fn read_draft(input : String) -> Bool {
   read_front_matter_value(input, "draft") == "true"
 }
 
+///|
 pub fn read_order(input : String) -> Int {
   parse_non_negative_int(read_front_matter_value(input, "order"))
 }
 
+///|
 pub fn read_lang(input : String) -> String {
   let lang = read_front_matter_value(input, "lang")
-  if lang == "" { "en" } else { lang }
+  if lang == "" {
+    "en"
+  } else {
+    lang
+  }
 }
 
+///|
 fn read_first_heading(input : String) -> String {
   let lines = input.split("\n")
   for line in lines {
@@ -52,6 +64,7 @@ fn read_first_heading(input : String) -> String {
   ""
 }
 
+///|
 fn read_front_matter_value(input : String, key : String) -> String {
   if !has_front_matter(input) {
     return ""
@@ -74,6 +87,7 @@ fn read_front_matter_value(input : String, key : String) -> String {
   ""
 }
 
+///|
 fn clean_value(value : String) -> String {
   let text = value.trim().to_owned()
   if text.length() >= 2 && text.has_prefix("\"") && text.has_suffix("\"") {
@@ -83,6 +97,7 @@ fn clean_value(value : String) -> String {
   }
 }
 
+///|
 fn parse_non_negative_int(value : String) -> Int {
   let text = value.trim()
   let mut result = 0

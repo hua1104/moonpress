@@ -13,33 +13,50 @@ MoonPress is a MoonBit-first static site and documentation generator. It is desi
 
 This repository starts with the reusable core model, route helpers, a small Markdown rendering layer, and an initial CLI entry point. The next milestones will add filesystem scanning, front matter parsing, theme assets, local preview, search index generation, and integration tests.
 
-## Planned Usage
-
-```bash
-moon run src/cmd/moonpress -- build docs --out dist
-moon run src/cmd/moonpress -- dev docs --port 8080
-```
-
-## Current Demo
-
-The current CLI builds the sample `docs/` directory into `dist/`:
+## Usage
 
 ```bash
 moon run src/cmd/moonpress
+```
+
+The default command builds the sample `docs/` directory into `dist/`.
+
+After the JS backend artifact is built, custom input, output, base URL, and preview commands can be used directly with Node:
+
+```bash
+node _build/js/debug/build/cmd/moonpress/moonpress.js build docs --out site
+node _build/js/debug/build/cmd/moonpress/moonpress.js build docs --out site --base-url https://example.com/moonpress/
+node _build/js/debug/build/cmd/moonpress/moonpress.js dev docs --out site --port 8080
+node _build/js/debug/build/cmd/moonpress/moonpress.js clean --out site
 ```
 
 Expected output includes `dist/index.html`, a guide page, `dist/search-index.json`, `dist/sitemap.xml`, copied assets under `dist/assets/`, and `dist/moonpress-manifest.txt`.
 
 The sample site is bilingual. English pages are emitted at the site root, and Chinese pages are emitted under `dist/zh/`. Open `dist/index.html` or `dist/zh/index.html` to try the language switcher.
 
-After the JS backend artifact is built, custom input and output paths can be used directly with Node:
+## Quality Gates
+
+The project is expected to pass the current MoonBit toolchain checks:
 
 ```bash
-node _build/js/debug/build/cmd/moonpress/moonpress.js build docs --out site
-node _build/js/debug/build/cmd/moonpress/moonpress.js build docs --out site --base-url https://example.com/moonpress/
-node _build/js/debug/build/cmd/moonpress/moonpress.js clean --out site
+moon check
+moon fmt --check
+moon info
+moon test
+```
+
+The CI workflow also attempts the review-required `moon fmt --deny-warn` and `moon info --deny-warn` commands first. If the installed stable MoonBit toolchain does not support those flags yet, it falls back to the current stable equivalents above.
+
+## Publishing
+
+The module name is `hua1104/moonpress`, and the repository field points to `https://github.com/hua1104/moonpress.git`. To publish after logging in to mooncakes.io:
+
+```bash
+moon login
+moon package
+moon publish
 ```
 
 ## Project Status
 
-Competition application phase. The repository is organized as a reusable MoonBit package plus CLI package. The core can already plan routes, parse page metadata, render HTML, generate navigation and pager links, produce a search index, generate a sitemap, build bilingual output, and write a real `dist/` directory from `docs/`.
+Competition application phase. The repository is organized as a reusable MoonBit package plus CLI package. The core can plan routes, parse page metadata, render HTML, generate navigation and pager links, produce a search index, generate a sitemap, build bilingual output, write a real `dist/` directory from `docs/`, and serve a local preview through the CLI package.

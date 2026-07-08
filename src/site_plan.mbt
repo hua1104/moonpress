@@ -1,8 +1,10 @@
+///|
 pub(all) struct PageSource {
   path : String
   source : String
 }
 
+///|
 pub(all) struct PagePlan {
   source_path : String
   route : String
@@ -14,6 +16,7 @@ pub(all) struct PagePlan {
   draft : Bool
 }
 
+///|
 pub fn plan_page(path : String, source : String) -> PagePlan {
   let title = read_title(source)
   let lang = read_lang(source)
@@ -22,7 +25,11 @@ pub fn plan_page(path : String, source : String) -> PagePlan {
     source_path: path,
     route: normalize_route(route_path),
     output_path: route_to_output_path(normalize_route(route_path)),
-    title: if title == "" { fallback_title(path) } else { title },
+    title: if title == "" {
+      fallback_title(path)
+    } else {
+      title
+    },
     description: read_description(source),
     order: read_order(source),
     lang,
@@ -30,6 +37,7 @@ pub fn plan_page(path : String, source : String) -> PagePlan {
   }
 }
 
+///|
 pub fn collect_pages(sources : Array[PageSource]) -> Array[PagePlan] {
   let pages : Array[PagePlan] = []
   for source in sources {
@@ -42,9 +50,10 @@ pub fn collect_pages(sources : Array[PageSource]) -> Array[PagePlan] {
   pages
 }
 
+///|
 pub fn collect_pages_for_lang(
   sources : Array[PageSource],
-  lang : String
+  lang : String,
 ) -> Array[PagePlan] {
   let pages : Array[PagePlan] = []
   for source in sources {
@@ -57,6 +66,7 @@ pub fn collect_pages_for_lang(
   pages
 }
 
+///|
 fn compare_page_plan(a : PagePlan, b : PagePlan) -> Int {
   let order_cmp = a.order.compare(b.order)
   if order_cmp != 0 {
@@ -66,6 +76,7 @@ fn compare_page_plan(a : PagePlan, b : PagePlan) -> Int {
   }
 }
 
+///|
 fn fallback_title(path : String) -> String {
   let route = normalize_route(path)
   if route == "/" {
@@ -79,10 +90,15 @@ fn fallback_title(path : String) -> String {
         title = text
       }
     }
-    if title == "" { "Untitled" } else { title }
+    if title == "" {
+      "Untitled"
+    } else {
+      title
+    }
   }
 }
 
+///|
 fn source_path_for_route(path : String, lang : String) -> String {
   let prefix = lang + "/"
   if lang != "en" && path.has_prefix(prefix) {

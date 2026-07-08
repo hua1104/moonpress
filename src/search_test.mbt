@@ -1,3 +1,4 @@
+///|
 test "compact text removes front matter and blank lines" {
   inspect(
     compact_text("---\ntitle: Home\n---\n# Home\n\nWelcome."),
@@ -5,6 +6,7 @@ test "compact text removes front matter and blank lines" {
   )
 }
 
+///|
 test "build search index escapes json strings" {
   let pages = collect_pages([
     {
