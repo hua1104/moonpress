@@ -35,3 +35,21 @@ test "render sidebar keeps localized links" {
     content="<nav class=\"mp-sidebar\">\n  <a class=\"mp-nav-item depth-0\" href=\"/zh/\">首页</a>\n  <a class=\"mp-nav-item depth-1\" href=\"/zh/guide/start\">快速开始</a>\n</nav>\n",
   )
 }
+
+///|
+test "navigation and language switcher honor base url" {
+  let sidebar = render_sidebar_with_base_url(
+    [{ title: "Guide", route: "/guide", depth: 0 }],
+    "en",
+    "/moonpress/",
+  )
+  inspect(sidebar.find("href=\"/moonpress/guide\"") is Some(_), content="true")
+  let switcher = render_language_switcher_with_base_url(
+    "en", "/guide", "/moonpress/",
+  )
+  inspect(switcher.find("href=\"/moonpress/guide\"") is Some(_), content="true")
+  inspect(
+    switcher.find("href=\"/moonpress/zh/guide\"") is Some(_),
+    content="true",
+  )
+}

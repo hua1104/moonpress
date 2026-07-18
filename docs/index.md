@@ -12,3 +12,8 @@ MoonPress turns Markdown documents into a static documentation site for MoonBit 
 
 MoonBit package authors need a lightweight way to publish tutorials, API notes, examples, and project documentation without leaving the MoonBit ecosystem.
 
+## Explore
+
+- [Getting Started](guide/getting-started/)
+- [Architecture](architecture/)
+- [Configuration](configuration/)

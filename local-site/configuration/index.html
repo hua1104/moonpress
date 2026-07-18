@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configuration</title>
+  <link rel="stylesheet" href="/moonpress/assets/moonpress.css">
+</head>
+<body>
+<div class="mp-lang-switch"><a class="mp-lang active" href="/moonpress/configuration">English</a><a class="mp-lang" href="/moonpress/zh/configuration">中文</a></div>
+<nav class="mp-sidebar">
+  <a class="mp-nav-item depth-0" href="/moonpress/">MoonPress</a>
+  <a class="mp-nav-item depth-1" href="/moonpress/guide/getting-started">Getting Started</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/architecture">Architecture</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/configuration">Configuration</a>
+</nav>
+  <main class="mp-doc">
+<h1>Configuration</h1>
+<p>MoonPress currently reads page-level metadata from front matter.</p>
+<h2>Page fields</h2>
+<ul>
+  <li><code>title</code>: page title used in navigation, HTML title, and search index.</li>
+  <li><code>description</code>: short text for the search index and future metadata tags.</li>
+  <li><code>order</code>: numeric ordering key for navigation and pager links.</li>
+  <li><code>draft</code>: set to <code>true</code> to skip a page during builds.</li>
+  <li><code>lang</code>: page language, currently <code>en</code> or <code>zh</code>.</li>
+</ul>
+<h2>CLI options</h2>
+<ul>
+  <li><code>--out</code>: generated site directory, <code>dist</code> by default.</li>
+  <li><code>--base-url</code>: deployment root such as <code>/moonpress/</code> or <code>https://example.com/docs/</code>.</li>
+  <li><code>--port</code>: preview server port, <code>8080</code> by default.</li>
+</ul>
+<h2>Example</h2>
+<pre><code>---
+title: Getting Started
+description: Build a first MoonPress site
+order: 2
+draft: false
+---
+
+# Getting Started
+</code></pre>
+<nav class="mp-pager">
+  <a class="mp-prev" href="/moonpress/architecture">Previous: Architecture</a>
+</nav>
+  </main>
+</body>
+</html>

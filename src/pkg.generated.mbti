@@ -6,6 +6,8 @@ pub fn build_manifest(BuildResult) -> String
 
 pub fn build_search_index(Array[PagePlan], Array[PageSource]) -> String
 
+pub fn build_search_index_for_lang(Array[PagePlan], Array[PageSource], String, String) -> String
+
 pub fn build_site(Array[PageSource]) -> BuildResult
 
 pub fn build_site_for_lang(Array[PageSource], SiteConfig, String) -> BuildResult
@@ -13,6 +15,8 @@ pub fn build_site_for_lang(Array[PageSource], SiteConfig, String) -> BuildResult
 pub fn build_site_with_config(Array[PageSource], SiteConfig) -> BuildResult
 
 pub fn build_sitemap(Array[PagePlan], String) -> String
+
+pub fn build_sitemap_for_lang(Array[PagePlan], String, String) -> String
 
 pub fn collect_pages(Array[PageSource]) -> Array[PagePlan]
 
@@ -34,13 +38,19 @@ pub fn has_front_matter(String) -> Bool
 
 pub fn localized_href(String, String) -> String
 
+pub fn localized_href_with_base_url(String, String, String) -> String
+
 pub fn merge_build_results(Array[BuildResult]) -> BuildResult
 
 pub fn navigation_from_pages(Array[PagePlan]) -> Array[NavItem]
 
+pub fn normalize_base_url(String) -> String
+
 pub fn normalize_route(String) -> String
 
 pub fn page_shell(String, String) -> String
+
+pub fn page_shell_with_base_url(String, String, String, String, String, String) -> String
 
 pub fn page_shell_with_navigation(String, String, String) -> String
 
@@ -64,9 +74,13 @@ pub fn render_inline(String) -> String
 
 pub fn render_language_switcher(String, String) -> String
 
+pub fn render_language_switcher_with_base_url(String, String, String) -> String
+
 pub fn render_markdown(String) -> String
 
 pub fn render_page(String, String) -> String
+
+pub fn render_page_with_base_url(String, String, String, String, String, String) -> String
 
 pub fn render_page_with_chrome(String, String, String, String, String) -> String
 
@@ -76,9 +90,13 @@ pub fn render_pager(Array[PagePlan], Int) -> String
 
 pub fn render_pager_for_lang(Array[PagePlan], Int, String) -> String
 
+pub fn render_pager_with_base_url(Array[PagePlan], Int, String, String) -> String
+
 pub fn render_sidebar(Array[NavItem]) -> String
 
 pub fn render_sidebar_for_lang(Array[NavItem], String) -> String
+
+pub fn render_sidebar_with_base_url(Array[NavItem], String, String) -> String
 
 pub fn route_depth(String) -> Int
 
@@ -89,6 +107,8 @@ pub fn search_entry_json(SearchEntry) -> String
 pub fn strip_front_matter(String) -> String
 
 pub fn version() -> String
+
+pub fn with_base_url(String, String) -> String
 
 // Errors
 
@@ -161,4 +181,3 @@ pub(all) struct SiteConfig {
 // Type aliases
 
 // Traits
-

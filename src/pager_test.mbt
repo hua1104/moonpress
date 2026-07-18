@@ -34,3 +34,15 @@ test "render pager keeps localized links" {
     content="<nav class=\"mp-pager\">\n  <a class=\"mp-next\" href=\"/zh/guide\">Next: 指南</a>\n</nav>\n",
   )
 }
+
+///|
+test "pager honors base url" {
+  let pages = collect_pages([
+    { path: "index.md", source: "---\ntitle: Home\norder: 1\n---\n# Home" },
+    { path: "guide.md", source: "---\ntitle: Guide\norder: 2\n---\n# Guide" },
+  ])
+  inspect(
+    render_pager_with_base_url(pages, 0, "en", "/moonpress/"),
+    content="<nav class=\"mp-pager\">\n  <a class=\"mp-next\" href=\"/moonpress/guide\">Next: Guide</a>\n</nav>\n",
+  )
+}

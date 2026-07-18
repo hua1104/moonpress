@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>架构设计</title>
+  <link rel="stylesheet" href="/moonpress/assets/moonpress.css">
+</head>
+<body>
+<div class="mp-lang-switch"><a class="mp-lang" href="/moonpress/architecture">English</a><a class="mp-lang active" href="/moonpress/zh/architecture">中文</a></div>
+<nav class="mp-sidebar">
+  <a class="mp-nav-item depth-0" href="/moonpress/zh/">MoonPress</a>
+  <a class="mp-nav-item depth-1" href="/moonpress/zh/guide/getting-started">快速开始</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/zh/architecture">架构设计</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/zh/configuration">配置说明</a>
+</nav>
+  <main class="mp-doc">
+<h1>架构设计</h1>
+<p>MoonPress 分为可复用核心库和 CLI 包两部分。</p>
+<h2>核心库</h2>
+<ul>
+  <li><code>frontmatter.mbt</code> 读取页面元数据。</li>
+  <li><code>router.mbt</code> 把 Markdown 路径映射为文档路由。</li>
+  <li><code>site_plan.mbt</code> 生成排序后的页面计划。</li>
+  <li><code>markdown.mbt</code> 渲染 Markdown 子集。</li>
+  <li><code>navigation.mbt</code> 和 <code>pager.mbt</code> 生成浏览链接。</li>
+  <li><code>builder.mbt</code> 输出 HTML、搜索索引、sitemap 和 manifest。</li>
+</ul>
+<h2>CLI 包</h2>
+<p>CLI 包负责扫描 <code>docs/</code>、复制静态资源、写入 <code>dist/</code>，并提供清理命令。</p>
+<nav class="mp-pager">
+  <a class="mp-prev" href="/moonpress/zh/guide/getting-started">Previous: 快速开始</a>
+  <a class="mp-next" href="/moonpress/zh/configuration">Next: 配置说明</a>
+</nav>
+  </main>
+</body>
+</html>

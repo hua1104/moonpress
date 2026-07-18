@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Getting Started</title>
+  <link rel="stylesheet" href="/moonpress/assets/moonpress.css">
+</head>
+<body>
+<div class="mp-lang-switch"><a class="mp-lang active" href="/moonpress/guide/getting-started">English</a><a class="mp-lang" href="/moonpress/zh/guide/getting-started">中文</a></div>
+<nav class="mp-sidebar">
+  <a class="mp-nav-item depth-0" href="/moonpress/">MoonPress</a>
+  <a class="mp-nav-item depth-1" href="/moonpress/guide/getting-started">Getting Started</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/architecture">Architecture</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/configuration">Configuration</a>
+</nav>
+  <main class="mp-doc">
+<h1>Getting Started</h1>
+<p>Create a <code>docs</code> directory, add Markdown files, and run the MoonPress CLI to generate HTML pages.</p>
+<h2>Build command</h2>
+<pre><code>moon run src/cmd/moonpress -- build docs --out dist
+</code></pre>
+<p>For GitHub Pages project sites, include the repository path:</p>
+<pre><code>moon run src/cmd/moonpress -- build docs --out dist --base-url /moonpress/
+</code></pre>
+<nav class="mp-pager">
+  <a class="mp-prev" href="/moonpress/">Previous: MoonPress</a>
+  <a class="mp-next" href="/moonpress/architecture">Next: Architecture</a>
+</nav>
+  </main>
+</body>
+</html>

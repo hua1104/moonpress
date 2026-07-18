@@ -5,6 +5,17 @@ test "normalize markdown route" {
 }
 
 ///|
+test "join site paths with root and nested base urls" {
+  inspect(with_base_url("/", "/guide"), content="/guide")
+  inspect(with_base_url("moonpress/", "/guide"), content="/moonpress/guide")
+  inspect(with_base_url("/moonpress/", "/"), content="/moonpress/")
+  inspect(
+    with_base_url("https://example.com/moonpress/", "/assets/site.css"),
+    content="https://example.com/moonpress/assets/site.css",
+  )
+}
+
+///|
 test "render heading" {
   let html = render_markdown("# Hello")
   inspect(html, content="<h1>Hello</h1>\n")

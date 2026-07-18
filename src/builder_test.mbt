@@ -24,7 +24,7 @@ test "build site skips draft pages" {
 }
 
 ///|
-test "build site uses config base url for sitemap" {
+test "build site uses config base url for html and sitemap" {
   let result = build_site_with_config(
     [{ path: "index.md", source: "# Home" }],
     {
@@ -36,8 +36,49 @@ test "build site uses config base url for sitemap" {
   inspect(result.files[1].path, content="search-index.json")
   inspect(result.files[2].path, content="sitemap.xml")
   inspect(
+    result.files[0].content.find(
+      "href=\"https://example.com/docs/assets/moonpress.css\"",
+    )
+    is Some(_),
+    content="true",
+  )
+  inspect(
+    result.files[0].content.find("href=\"https://example.com/docs/\"")
+    is Some(_),
+    content="true",
+  )
+  inspect(
     result.files[2].content,
     content="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://example.com/docs/</loc></url>\n</urlset>\n",
+  )
+}
+
+///|
+test "localized build uses one base url for every html link" {
+  let result = build_site_for_lang(
+    [
+      {
+        path: "zh/index.md",
+        source: "---\ntitle: Home\nlang: zh\norder: 1\n---\n# Home",
+      },
+      {
+        path: "zh/guide.md",
+        source: "---\ntitle: Guide\nlang: zh\norder: 2\n---\n# Guide",
+      },
+    ],
+    { title: "Docs", description: "Docs", base_url: "/moonpress/" },
+    "zh",
+  )
+  let html = result.files[0].content
+  inspect(
+    html.find("href=\"/moonpress/assets/moonpress.css\"") is Some(_),
+    content="true",
+  )
+  inspect(html.find("href=\"/moonpress/zh/guide\"") is Some(_), content="true")
+  inspect(html.find("href=\"/moonpress/\"") is Some(_), content="true")
+  inspect(
+    result.files[3].content.find("<loc>/moonpress/zh/</loc>") is Some(_),
+    content="true",
   )
 }
 

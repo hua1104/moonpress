@@ -26,3 +26,42 @@ pub fn route_to_output_path(route : String) -> String {
     route[1:].to_owned() + "/index.html"
   }
 }
+
+///|
+pub fn normalize_base_url(base_url : String) -> String {
+  if base_url == "" || base_url == "/" {
+    ""
+  } else {
+    let trimmed = if base_url.has_suffix("/") {
+      base_url[:base_url.length() - 1].to_owned()
+    } else {
+      base_url
+    }
+    if trimmed.has_prefix("/") ||
+      trimmed.has_prefix("http://") ||
+      trimmed.has_prefix("https://") {
+      trimmed
+    } else {
+      "/" + trimmed
+    }
+  }
+}
+
+///|
+pub fn with_base_url(base_url : String, path : String) -> String {
+  let base = normalize_base_url(base_url)
+  let normalized_path = if path == "" || path == "/" {
+    "/"
+  } else if path.has_prefix("/") {
+    path
+  } else {
+    "/" + path
+  }
+  if base == "" {
+    normalized_path
+  } else if normalized_path == "/" {
+    base + "/"
+  } else {
+    base + normalized_path
+  }
+}

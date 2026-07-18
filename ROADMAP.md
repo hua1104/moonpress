@@ -1,33 +1,18 @@
 # MoonPress Roadmap
 
-## Phase 1: Application and Repository Initialization
+## Implemented
 
-- Define project scope and competition positioning.
-- Create the MoonBit module structure.
-- Add the core document model, route helpers, and first renderer.
-- Add sample documentation content.
-- Prepare one-page application material.
+- Recursive Markdown discovery and front matter parsing.
+- Static HTML generation with stable document routes.
+- English and Chinese output, navigation, language switching, and pager links.
+- Search indexes, sitemaps, build manifests, and static asset copying.
+- `build`, `clean`, and `dev` CLI commands.
+- Root and nested base URL deployment support.
+- MoonBit unit tests and Node.js CLI/preview integration tests.
 
-## Phase 2: Build Pipeline
+## Next
 
-- Scan a docs directory recursively.
-- Parse front matter into structured page metadata.
-- Generate route and output file plans.
-- Write static HTML and copy assets.
-- Add tests for route planning and rendering.
-
-## Phase 3: Documentation Experience
-
-- Generate sidebar navigation.
-- Add previous/next page links.
-- Add code block rendering.
-- Generate a JSON search index.
-- Provide a polished default theme.
-- Generate sitemap and build manifest files.
-
-## Phase 4: CLI and Preview
-
-- Implement `build`, `clean`, and `dev` commands.
-- Add local preview server.
-- Add watch rebuild mode.
-- Publish demo site artifacts.
+- Watch mode with incremental rebuilds.
+- Configurable themes and site-level configuration files.
+- Richer CommonMark compatibility.
+- Published demo artifacts and versioned binary releases.

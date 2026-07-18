@@ -46,11 +46,7 @@ fn run_build(args : Array[String]) -> Unit {
   )
   let zh_result = @core.build_site_for_lang(
     sources,
-    {
-      title: "MoonPress",
-      description: "MoonBit documentation site",
-      base_url: join_base_url(base_url, "zh"),
-    },
+    { title: "MoonPress", description: "MoonBit documentation site", base_url },
     "zh",
   )
   let result = @core.merge_build_results([en_result, zh_result])
@@ -70,18 +66,8 @@ fn run_dev(args : Array[String]) -> Unit {
   run_build(args)
   let out_dir = find_option(args, "--out", "dist")
   let port = parse_port(find_option(args, "--port", "8080"))
-  start_preview(out_dir, port)
-}
-
-///|
-fn join_base_url(base_url : String, segment : String) -> String {
-  if base_url == "" || base_url == "/" {
-    "/" + segment + "/"
-  } else if base_url.has_suffix("/") {
-    base_url + segment + "/"
-  } else {
-    base_url + "/" + segment + "/"
-  }
+  let base_url = find_option(args, "--base-url", "/")
+  start_preview(out_dir, port, base_url)
 }
 
 ///|
@@ -110,13 +96,12 @@ fn parse_port(value : String) -> Int {
 
 ///|
 fn find_build_input(args : Array[String]) -> String {
-  let mut seen_build = false
-  for arg in args {
-    if seen_build && !arg.has_prefix("-") {
-      return arg
-    }
-    if arg == "build" {
-      seen_build = true
+  for i = 0; i < args.length(); i = i + 1 {
+    if args[i] == "build" || args[i] == "dev" {
+      if i + 1 < args.length() && !args[i + 1].has_prefix("-") {
+        return args[i + 1]
+      }
+      return "docs"
     }
   }
   "docs"
@@ -145,7 +130,7 @@ fn print_help() -> Unit {
   println("moonpress " + @core.version())
   println("Usage:")
   println("  moonpress build [docs-dir] --out dist --base-url /")
-  println("  moonpress dev [docs-dir] --out dist --port 8080")
+  println("  moonpress dev [docs-dir] --out dist --base-url / --port 8080")
   println("  moonpress clean --out dist")
   println("  moonpress version")
 }

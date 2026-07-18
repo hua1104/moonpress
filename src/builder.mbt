@@ -30,28 +30,38 @@ pub fn build_site_for_lang(
   lang : String,
 ) -> BuildResult {
   let pages = collect_pages_for_lang(sources, lang)
-  let sidebar = render_sidebar_for_lang(navigation_from_pages(pages), lang)
+  let sidebar = render_sidebar_with_base_url(
+    navigation_from_pages(pages),
+    lang,
+    config.base_url,
+  )
   let files : Array[OutputFile] = []
   for index, page in pages {
     let markdown = page_source_body(sources, page.source_path)
     files.push({
       path: localized_output_path(lang, page.output_path),
-      content: render_page_with_chrome(
+      content: render_page_with_base_url(
         page.title,
         lang,
-        render_language_switcher(lang, page.route) + sidebar,
+        render_language_switcher_with_base_url(
+          lang,
+          page.route,
+          config.base_url,
+        ) +
+        sidebar,
         markdown,
-        render_pager_for_lang(pages, index, lang),
+        render_pager_with_base_url(pages, index, lang, config.base_url),
+        config.base_url,
       ),
     })
   }
   files.push({
     path: localized_output_path(lang, "search-index.json"),
-    content: build_search_index(pages, sources),
+    content: build_search_index_for_lang(pages, sources, config.base_url, lang),
   })
   files.push({
     path: localized_output_path(lang, "sitemap.xml"),
-    content: build_sitemap(pages, config.base_url),
+    content: build_sitemap_for_lang(pages, config.base_url, lang),
   })
   files.push({
     path: localized_output_path(lang, "assets/moonpress.css"),
@@ -89,12 +99,16 @@ fn localized_output_path(lang : String, path : String) -> String {
 
 ///|
 pub fn default_stylesheet() -> String {
-  ":root{font-family:system-ui,sans-serif;color:#17202a;background:#f7f9fb}" +
-  "body{margin:0}.mp-doc{width:min(760px,calc(100% - 32px));margin:0 auto;padding:48px 0 72px}" +
-  ".mp-sidebar{display:flex;gap:12px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid #dbe4ea}" +
-  ".mp-nav-item{color:#0f3d5e;text-decoration:none}.mp-nav-item:hover{text-decoration:underline}" +
-  ".mp-pager{display:flex;justify-content:space-between;gap:16px;margin-top:40px;padding-top:20px;border-top:1px solid #dbe4ea}" +
-  ".mp-pager a{color:#0f3d5e;text-decoration:none}"
+  ":root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#17202a;background:#f7f9fb;line-height:1.6}" +
+  "body{margin:0}.mp-header{position:sticky;top:0;z-index:10;border-bottom:1px solid #dbe4ea;background:#ffffff}" +
+  ".mp-lang-switch{display:flex;justify-content:flex-end;gap:4px;padding:8px max(16px,calc((100% - 960px)/2));border-bottom:1px solid #edf1f5}" +
+  ".mp-lang{padding:5px 9px;color:#496273;text-decoration:none}.mp-lang.active{color:#0f3d5e;font-weight:700;background:#eaf3f7}" +
+  ".mp-sidebar{display:flex;gap:6px;flex-wrap:wrap;max-width:960px;margin:0 auto;padding:10px 16px}" +
+  ".mp-nav-item{min-height:40px;box-sizing:border-box;display:inline-flex;align-items:center;padding:0 12px;border:1px solid #dbe4ea;color:#0f3d5e;text-decoration:none}" +
+  ".mp-nav-item:hover,.mp-nav-item:focus-visible{background:#eaf3f7;border-color:#79aabd}.mp-doc{width:min(760px,calc(100% - 32px));margin:0 auto;padding:42px 0 72px}" +
+  "h1,h2,h3{line-height:1.2}.mp-doc a{color:#075b7d;text-underline-offset:3px}code,pre{font-family:ui-monospace,Consolas,monospace}" +
+  "pre{overflow-x:auto;padding:14px 16px;border:1px solid #dbe4ea;background:#ffffff}.mp-pager{display:flex;justify-content:space-between;gap:12px;margin-top:40px;padding-top:20px;border-top:1px solid #dbe4ea}" +
+  ".mp-pager a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border:1px solid #9db7c4;color:#0f3d5e;text-decoration:none}.mp-pager a:hover,.mp-pager a:focus-visible{background:#eaf3f7}@media(max-width:600px){.mp-doc{padding-top:28px}.mp-sidebar{flex-wrap:nowrap;overflow-x:auto}.mp-nav-item{flex:0 0 auto}.mp-pager{align-items:stretch;flex-direction:column}.mp-pager a{justify-content:center}}"
 }
 
 ///|

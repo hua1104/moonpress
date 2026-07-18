@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture</title>
+  <link rel="stylesheet" href="/moonpress/assets/moonpress.css">
+</head>
+<body>
+<div class="mp-lang-switch"><a class="mp-lang active" href="/moonpress/architecture">English</a><a class="mp-lang" href="/moonpress/zh/architecture">中文</a></div>
+<nav class="mp-sidebar">
+  <a class="mp-nav-item depth-0" href="/moonpress/">MoonPress</a>
+  <a class="mp-nav-item depth-1" href="/moonpress/guide/getting-started">Getting Started</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/architecture">Architecture</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/configuration">Configuration</a>
+</nav>
+  <main class="mp-doc">
+<h1>Architecture</h1>
+<p>MoonPress is split into a reusable core library and a small CLI package.</p>
+<h2>Core library</h2>
+<ul>
+  <li><code>frontmatter.mbt</code> reads page metadata such as <code>title</code>, <code>description</code>, <code>order</code>, and <code>draft</code>.</li>
+  <li><code>router.mbt</code> maps Markdown paths to stable documentation routes.</li>
+  <li><code>site_plan.mbt</code> turns input documents into sorted page plans.</li>
+  <li><code>markdown.mbt</code> renders the supported Markdown subset to HTML.</li>
+  <li><code>navigation.mbt</code> and <code>pager.mbt</code> generate document browsing links.</li>
+  <li><code>builder.mbt</code> turns page plans into output files.</li>
+  <li><code>search.mbt</code>, <code>sitemap.mbt</code>, and <code>manifest.mbt</code> generate deployment metadata.</li>
+</ul>
+<h2>CLI package</h2>
+<p>The CLI package lives in <code>src/cmd/moonpress</code>. It handles runtime-specific work:</p>
+<ul>
+  <li>scanning <code>docs/</code> for Markdown files</li>
+  <li>copying <code>docs/assets/</code></li>
+  <li>writing the generated files to <code>dist/</code></li>
+  <li>cleaning output directories</li>
+</ul>
+<h2>Build flow</h2>
+<pre><code>docs/*.md
+  -&gt; PageSource
+  -&gt; PagePlan
+  -&gt; Rendered HTML
+  -&gt; dist/
+</code></pre>
+<p>The core stays independent from the Node.js filesystem bridge. This keeps the main site generation logic easy to test and reusable from other MoonBit packages.</p>
+<nav class="mp-pager">
+  <a class="mp-prev" href="/moonpress/guide/getting-started">Previous: Getting Started</a>
+  <a class="mp-next" href="/moonpress/configuration">Next: Configuration</a>
+</nav>
+  </main>
+</body>
+</html>

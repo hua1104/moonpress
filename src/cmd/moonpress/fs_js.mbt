@@ -82,8 +82,8 @@ extern "js" fn copy_asset_dir(
   #| }
 
 ///|
-extern "js" fn serve_dir(root : String, port : Int) -> Unit =
-  #| function(root, port) {
+extern "js" fn serve_dir(root : String, port : Int, base_url : String) -> Unit =
+  #| function(root, port, baseUrl) {
   #|   const fs = require("fs");
   #|   const http = require("http");
   #|   const path = require("path");
@@ -96,10 +96,42 @@ extern "js" fn serve_dir(root : String, port : Int) -> Unit =
   #|     ".xml": "application/xml; charset=utf-8",
   #|     ".txt": "text/plain; charset=utf-8"
   #|   };
+  #|   function basePath(value) {
+  #|     let result = value || "/";
+  #|     try {
+  #|       if (/^https?:\/\//.test(result)) {
+  #|         result = new URL(result).pathname;
+  #|       }
+  #|     } catch (_) {
+  #|       result = "/";
+  #|     }
+  #|     if (!result.startsWith("/")) {
+  #|       result = "/" + result;
+  #|     }
+  #|     while (result.length > 1 && result.endsWith("/")) {
+  #|       result = result.slice(0, -1);
+  #|     }
+  #|     return result;
+  #|   }
+  #|   const mount = basePath(baseUrl);
   #|   const server = http.createServer((req, res) => {
-  #|     const raw = decodeURIComponent((req.url || "/").split("?")[0]);
+  #|     let raw = decodeURIComponent((req.url || "/").split("?")[0]);
+  #|     if (mount !== "/") {
+  #|       if (raw === mount) {
+  #|         res.writeHead(302, { "Location": mount + "/" });
+  #|         res.end();
+  #|         return;
+  #|       } else if (raw.startsWith(mount + "/")) {
+  #|         raw = raw.slice(mount.length);
+  #|       } else {
+  #|         res.writeHead(404);
+  #|         res.end("Not found");
+  #|         return;
+  #|       }
+  #|     }
   #|     let target = path.resolve(base, "." + raw);
-  #|     if (!target.startsWith(base)) {
+  #|     const relative = path.relative(base, target);
+  #|     if (relative.startsWith("..") || path.isAbsolute(relative)) {
   #|       res.writeHead(403);
   #|       res.end("Forbidden");
   #|       return;
@@ -116,7 +148,8 @@ extern "js" fn serve_dir(root : String, port : Int) -> Unit =
   #|     fs.createReadStream(target).pipe(res);
   #|   });
   #|   server.listen(port, "127.0.0.1", () => {
-  #|     console.log(`preview http://127.0.0.1:${port}/`);
+  #|     const suffix = mount === "/" ? "/" : mount + "/";
+  #|     console.log(`preview http://127.0.0.1:${port}${suffix}`);
   #|   });
   #| }
 
@@ -145,6 +178,6 @@ fn copy_assets(docs_dir : String, out_dir : String) -> Unit {
 }
 
 ///|
-fn start_preview(out_dir : String, port : Int) -> Unit {
-  serve_dir(out_dir, port)
+fn start_preview(out_dir : String, port : Int, base_url : String) -> Unit {
+  serve_dir(out_dir, port, base_url)
 }

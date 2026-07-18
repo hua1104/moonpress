@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>快速开始</title>
+  <link rel="stylesheet" href="/moonpress/assets/moonpress.css">
+</head>
+<body>
+<div class="mp-lang-switch"><a class="mp-lang" href="/moonpress/guide/getting-started">English</a><a class="mp-lang active" href="/moonpress/zh/guide/getting-started">中文</a></div>
+<nav class="mp-sidebar">
+  <a class="mp-nav-item depth-0" href="/moonpress/zh/">MoonPress</a>
+  <a class="mp-nav-item depth-1" href="/moonpress/zh/guide/getting-started">快速开始</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/zh/architecture">架构设计</a>
+  <a class="mp-nav-item depth-0" href="/moonpress/zh/configuration">配置说明</a>
+</nav>
+  <main class="mp-doc">
+<h1>快速开始</h1>
+<p>创建 <code>docs</code> 目录，编写 Markdown 文件，然后运行 MoonPress CLI 生成 HTML 页面。</p>
+<h2>构建命令</h2>
+<pre><code>moon run src/cmd/moonpress -- build docs --out dist
+</code></pre>
+<p>GitHub Pages 椤圭洰绔欑偣闇€瑕佹寚瀹氫粨搴撳瓙璺緞锛?</p>
+<pre><code>moon run src/cmd/moonpress -- build docs --out dist --base-url /moonpress/
+</code></pre>
+<nav class="mp-pager">
+  <a class="mp-prev" href="/moonpress/zh/">Previous: MoonPress</a>
+  <a class="mp-next" href="/moonpress/zh/architecture">Next: 架构设计</a>
+</nav>
+  </main>
+</body>
+</html>

@@ -1,0 +1,10 @@
+MoonPress Build Manifest
+pages: 4
+files:
+- zh/index.html
+- zh/guide/getting-started/index.html
+- zh/architecture/index.html
+- zh/configuration/index.html
+- zh/search-index.json
+- zh/sitemap.xml
+- zh/assets/moonpress.css

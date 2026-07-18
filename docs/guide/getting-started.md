@@ -8,9 +8,14 @@ order: 2
 
 Create a `docs` directory, add Markdown files, and run the MoonPress CLI to generate HTML pages.
 
-## Planned command
+## Build command
 
 ```bash
 moon run src/cmd/moonpress -- build docs --out dist
 ```
 
+For GitHub Pages project sites, include the repository path:
+
+```bash
+moon run src/cmd/moonpress -- build docs --out dist --base-url /moonpress/
+```

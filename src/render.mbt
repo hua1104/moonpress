@@ -20,6 +20,23 @@ pub fn page_shell_with_navigation_and_footer(
   body : String,
   footer : String,
 ) -> String {
+  page_shell_with_base_url(title, lang, navigation, body, footer, "/")
+}
+
+///|
+pub fn page_shell_with_base_url(
+  title : String,
+  lang : String,
+  navigation : String,
+  body : String,
+  footer : String,
+  base_url : String,
+) -> String {
+  let header = if navigation == "" {
+    ""
+  } else {
+    "  <header class=\"mp-header\">\n" + navigation + "  </header>\n"
+  }
   "<!doctype html>\n" +
   "<html lang=\"" +
   escape_html(lang) +
@@ -30,10 +47,12 @@ pub fn page_shell_with_navigation_and_footer(
   "  <title>" +
   escape_html(title) +
   "</title>\n" +
-  "  <link rel=\"stylesheet\" href=\"/assets/moonpress.css\">\n" +
+  "  <link rel=\"stylesheet\" href=\"" +
+  escape_html(with_base_url(base_url, "/assets/moonpress.css")) +
+  "\">\n" +
   "</head>\n" +
   "<body>\n" +
-  navigation +
+  header +
   "  <main class=\"mp-doc\">\n" +
   body +
   footer +
@@ -70,5 +89,24 @@ pub fn render_page_with_chrome(
     navigation,
     render_markdown(markdown),
     footer,
+  )
+}
+
+///|
+pub fn render_page_with_base_url(
+  title : String,
+  lang : String,
+  navigation : String,
+  markdown : String,
+  footer : String,
+  base_url : String,
+) -> String {
+  page_shell_with_base_url(
+    title,
+    lang,
+    navigation,
+    render_markdown(markdown),
+    footer,
+    base_url,
   )
 }

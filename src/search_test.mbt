@@ -25,3 +25,15 @@ test "build search index escapes json strings" {
     content="[{\"title\":\"Use \\\"MoonPress\\\"\",\"route\":\"/\",\"description\":\"A <site>\",\"text\":\"# Home\"}]",
   )
 }
+
+///|
+test "search index routes honor language and base url" {
+  let sources : Array[PageSource] = [
+    { path: "zh/index.md", source: "---\ntitle: Home\nlang: zh\n---\n# Home" },
+  ]
+  let pages = collect_pages_for_lang(sources, "zh")
+  inspect(
+    build_search_index_for_lang(pages, sources, "/moonpress/", "zh"),
+    content="[{\"title\":\"Home\",\"route\":\"/moonpress/zh/\",\"description\":\"\",\"text\":\"# Home\"}]",
+  )
+}

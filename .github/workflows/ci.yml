@@ -6,67 +6,37 @@ on:
 
 jobs:
   moonbit:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install MoonBit
-        shell: pwsh
-        run: |
-          Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
-          "$HOME\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+        uses: moonbitlang/setup-moonbit@v1
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24"
 
-      - name: moon check
-        shell: pwsh
-        run: moon check
+      - name: Check formatting
+        run: moon fmt --check
 
-      - name: moon fmt --deny-warn
-        shell: pwsh
-        run: |
-          $output = moon fmt --deny-warn 2>&1
-          $code = $LASTEXITCODE
-          $output | Write-Output
-          if ($code -ne 0) {
-            $text = ($output | Out-String)
-            if ($text.Contains("unexpected argument") -or $text.Contains("Usage: moon.exe fmt")) {
-              moon fmt --check
-            } else {
-              exit $code
-            }
-          }
+      - name: Check warnings
+        run: moon check --deny-warn
 
-      - name: moon info --deny-warn
-        shell: pwsh
-        run: |
-          $output = moon info --deny-warn 2>&1
-          $code = $LASTEXITCODE
-          $output | Write-Output
-          if ($code -ne 0) {
-            $text = ($output | Out-String)
-            if ($text.Contains("unexpected argument") -or $text.Contains("Usage: moon.exe info")) {
-              moon info
-            } else {
-              exit $code
-            }
-          }
+      - name: Run MoonBit tests
+        run: moon test --deny-warn
 
       - name: Verify generated interfaces
-        shell: pwsh
-        run: git diff --exit-code -- src/pkg.generated.mbti src/cmd/moonpress/pkg.generated.mbti
+        shell: bash
+        run: |
+          moon info
+          git diff --exit-code -- src/pkg.generated.mbti src/cmd/moonpress/pkg.generated.mbti
 
-      - name: moon test
-        shell: pwsh
-        run: moon test
+      - name: Build CLI
+        run: moon build --target js src/cmd/moonpress
 
-      - name: Build sample site
-        shell: pwsh
-        run: moon run src/cmd/moonpress
-
+      - name: Run CLI integration tests
+        run: node --test tests/cli.integration.test.mjs

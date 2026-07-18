@@ -11,6 +11,16 @@ pub fn build_search_index(
   pages : Array[PagePlan],
   sources : Array[PageSource],
 ) -> String {
+  build_search_index_for_lang(pages, sources, "/", "en")
+}
+
+///|
+pub fn build_search_index_for_lang(
+  pages : Array[PagePlan],
+  sources : Array[PageSource],
+  base_url : String,
+  lang : String,
+) -> String {
   let mut json = "["
   let mut first = true
   for page in pages {
@@ -22,7 +32,7 @@ pub fn build_search_index(
     json = json +
       search_entry_json({
         title: page.title,
-        route: page.route,
+        route: localized_href_with_base_url(base_url, lang, page.route),
         description: page.description,
         text: compact_text(source_for_path(sources, page.source_path)),
       })

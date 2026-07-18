@@ -12,6 +12,11 @@ lang: zh
 ## 构建命令
 
 ```bash
-moon run src/cmd/moonpress
+moon run src/cmd/moonpress -- build docs --out dist
 ```
 
+部署到 GitHub Pages 项目站点时，需要指定仓库子路径：
+
+```bash
+moon run src/cmd/moonpress -- build docs --out dist --base-url /moonpress/
+```
