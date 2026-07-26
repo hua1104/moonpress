@@ -1,0 +1,8 @@
+{
+  "title": "MoonPress",
+  "description": "A static documentation site generator written in MoonBit.",
+  "base_url": "/moonpress/",
+  "author": "hua1104",
+  "site_url": "https://hua1104.github.io",
+  "default_lang": "en"
+}

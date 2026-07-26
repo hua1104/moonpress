@@ -6,6 +6,7 @@ package "hua1104/moonpress/cmd/moonpress"
 // Errors
 
 // Types and methods
+type Options
 
 // Type aliases
 

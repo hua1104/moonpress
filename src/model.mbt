@@ -3,6 +3,9 @@ pub(all) struct SiteConfig {
   title : String
   description : String
   base_url : String
+  author : String
+  site_url : String
+  default_lang : String
 }
 
 ///|
@@ -34,6 +37,9 @@ pub fn default_config() -> SiteConfig {
     title: "MoonPress",
     description: "MoonBit documentation site",
     base_url: "/",
+    author: "",
+    site_url: "",
+    default_lang: "en",
   }
 }
 

@@ -32,7 +32,53 @@ test "render sidebar keeps localized links" {
   )
   inspect(
     html,
-    content="<nav class=\"mp-sidebar\">\n  <a class=\"mp-nav-item depth-0\" href=\"/zh/\">首页</a>\n  <a class=\"mp-nav-item depth-1\" href=\"/zh/guide/start\">快速开始</a>\n</nav>\n",
+    content=(
+      #|<nav class="mp-sidebar">
+      #|  <a class="mp-nav-item depth-0" href="/zh/">首页</a>
+      #|  <details class="mp-nav-group" open>
+      #|    <summary class="mp-nav-group-title">Guide</summary>
+      #|    <a class="mp-nav-item depth-1" href="/zh/guide/start">快速开始</a>
+      #|  </details>
+      #|</nav>
+      #|
+    ),
+  )
+}
+
+///|
+test "route section splits on the first nested segment" {
+  inspect(route_section("/"), content="")
+  inspect(route_section("/guide"), content="")
+  inspect(route_section("/guide/start"), content="guide")
+  inspect(route_section("/api/core/render"), content="api")
+}
+
+///|
+test "render sidebar groups nested routes and closes sections" {
+  let html = render_sidebar_with_base_url(
+    [
+      { title: "Home", route: "/", depth: 0 },
+      { title: "Start", route: "/guide/start", depth: 1 },
+      { title: "Next", route: "/guide/next", depth: 1 },
+      { title: "About", route: "/about", depth: 0 },
+    ],
+    "en",
+    "/moonpress/",
+  )
+  inspect(
+    html,
+    content=(
+      #|<nav class="mp-sidebar">
+      #|  <a class="mp-nav-item depth-0" href="/moonpress/">Home</a>
+      #|  <details class="mp-nav-group" open>
+      #|    <summary class="mp-nav-group-title">Guide</summary>
+      #|    <a class="mp-nav-item depth-1" href="/moonpress/guide/start">Start</a>
+      #|    <a class="mp-nav-item depth-1" href="/moonpress/guide/next">Next</a>
+      #|  </details>
+      #|  <a class="mp-nav-item depth-0" href="/moonpress/about">About</a>
+      #|</nav>
+      #|
+    ),
   )
 }
 

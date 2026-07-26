@@ -2,6 +2,8 @@
 package "hua1104/moonpress"
 
 // Values
+pub fn build_feed_for_lang(SiteConfig, Array[PagePlan], String) -> String
+
 pub fn build_manifest(BuildResult) -> String
 
 pub fn build_search_index(Array[PagePlan], Array[PageSource]) -> String
@@ -17,6 +19,10 @@ pub fn build_site_with_config(Array[PageSource], SiteConfig) -> BuildResult
 pub fn build_sitemap(Array[PagePlan], String) -> String
 
 pub fn build_sitemap_for_lang(Array[PagePlan], String, String) -> String
+
+pub fn canonical_url(SiteConfig, String, String) -> String
+
+pub fn collect_headings(String) -> Array[TocEntry]
 
 pub fn collect_pages(Array[PageSource]) -> Array[PagePlan]
 
@@ -36,6 +42,10 @@ pub fn escape_json(String) -> String
 
 pub fn has_front_matter(String) -> Bool
 
+pub fn highlight_code(String, String) -> String
+
+pub fn highlight_language_id(String) -> String
+
 pub fn localized_href(String, String) -> String
 
 pub fn localized_href_with_base_url(String, String, String) -> String
@@ -48,13 +58,21 @@ pub fn normalize_base_url(String) -> String
 
 pub fn normalize_route(String) -> String
 
+pub fn not_found_body(SiteConfig, String) -> String
+
+pub fn not_found_title(String) -> String
+
 pub fn page_shell(String, String) -> String
 
 pub fn page_shell_with_base_url(String, String, String, String, String, String) -> String
 
+pub fn page_shell_with_meta(SiteConfig, PageMeta, String) -> String
+
 pub fn page_shell_with_navigation(String, String, String) -> String
 
 pub fn page_shell_with_navigation_and_footer(String, String, String, String, String) -> String
+
+pub fn parse_config_json(String, SiteConfig) -> SiteConfig
 
 pub fn plan_page(String, String) -> PagePlan
 
@@ -84,6 +102,8 @@ pub fn render_page_with_base_url(String, String, String, String, String, String)
 
 pub fn render_page_with_chrome(String, String, String, String, String) -> String
 
+pub fn render_page_with_meta(SiteConfig, PageMeta, String) -> String
+
 pub fn render_page_with_navigation(String, String, String) -> String
 
 pub fn render_pager(Array[PagePlan], Int) -> String
@@ -98,13 +118,25 @@ pub fn render_sidebar_for_lang(Array[NavItem], String) -> String
 
 pub fn render_sidebar_with_base_url(Array[NavItem], String, String) -> String
 
+pub fn render_toc(Array[TocEntry], String) -> String
+
+pub fn render_toc_for_markdown(String, String) -> String
+
 pub fn route_depth(String) -> Int
+
+pub fn route_section(String) -> String
 
 pub fn route_to_output_path(String) -> String
 
 pub fn search_entry_json(SearchEntry) -> String
 
+pub fn search_script(String, String) -> String
+
+pub fn slugify(String) -> String
+
 pub fn strip_front_matter(String) -> String
+
+pub fn theme_bootstrap_script() -> String
 
 pub fn version() -> String
 
@@ -143,6 +175,16 @@ pub(all) struct OutputFile {
   content : String
 }
 
+pub(all) struct PageMeta {
+  title : String
+  description : String
+  lang : String
+  route : String
+  navigation : String
+  footer : String
+  toc : String
+}
+
 pub(all) struct PagePlan {
   source_path : String
   route : String
@@ -176,6 +218,15 @@ pub(all) struct SiteConfig {
   title : String
   description : String
   base_url : String
+  author : String
+  site_url : String
+  default_lang : String
+}
+
+pub(all) struct TocEntry {
+  level : Int
+  title : String
+  id : String
 }
 
 // Type aliases

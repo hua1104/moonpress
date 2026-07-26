@@ -1,136 +1,293 @@
 ///|
+struct Options {
+  command : String
+  input : String
+  out : String
+  base_url : String
+  config_path : String
+  port : Int
+  site_url : String
+  errors : Array[String]
+}
+
+///|
 fn main {
-  let args = @env.args()
-  let command = find_command(args)
-  if command == "build" {
-    run_build(args)
-  } else if command == "dev" {
-    run_dev(args)
-  } else if command == "clean" {
-    run_clean(args)
-  } else if command == "version" || command == "--version" || command == "-V" {
-    println("moonpress " + @core.version())
-  } else {
+  let options = parse_args(cli_args())
+  if options.errors.length() > 0 {
+    for message in options.errors {
+      print_error(message)
+    }
+    print_error("run `moonpress help` for usage")
+    exit_with(2)
+  } else if options.command == "help" {
     print_help()
+  } else if options.command == "version" {
+    println("moonpress " + @core.version())
+  } else if options.command == "build" {
+    run_build(options) |> ignore
+  } else if options.command == "dev" {
+    run_dev(options)
+  } else if options.command == "clean" {
+    run_clean(options)
   }
 }
 
 ///|
-fn find_command(args : Array[String]) -> String {
-  for arg in args {
-    if arg == "help" || arg == "--help" || arg == "-h" {
-      return "help"
-    } else if arg == "version" || arg == "--version" || arg == "-V" {
-      return "version"
-    } else if arg == "build" {
-      return "build"
-    } else if arg == "dev" {
-      return "dev"
-    } else if arg == "clean" {
-      return "clean"
+fn known_command(value : String) -> Bool {
+  value == "build" ||
+  value == "dev" ||
+  value == "clean" ||
+  value == "help" ||
+  value == "version"
+}
+
+///|
+fn parse_args(args : Array[String]) -> Options {
+  let errors : Array[String] = []
+  let mut command = ""
+  let mut input = ""
+  let mut out = ""
+  let mut base_url = ""
+  let mut config_path = ""
+  let mut site_url = ""
+  let mut port = 8080
+  let mut i = 0
+  while i < args.length() {
+    let arg = args[i]
+    if arg == "--help" || arg == "-h" {
+      command = "help"
+      i = i + 1
+    } else if arg == "--version" || arg == "-V" {
+      if command == "" {
+        command = "version"
+      }
+      i = i + 1
+    } else if known_command(arg) && command == "" {
+      command = arg
+      i = i + 1
+    } else if arg.has_prefix("-") {
+      let (name, inline_value, consumed) = split_option(args, i)
+      if name == "--out" {
+        match inline_value {
+          Some(value) => out = value
+          None => errors.push("missing value for --out")
+        }
+      } else if name == "--base-url" {
+        match inline_value {
+          Some(value) => base_url = value
+          None => errors.push("missing value for --base-url")
+        }
+      } else if name == "--config" {
+        match inline_value {
+          Some(value) => config_path = value
+          None => errors.push("missing value for --config")
+        }
+      } else if name == "--site-url" {
+        match inline_value {
+          Some(value) => site_url = value
+          None => errors.push("missing value for --site-url")
+        }
+      } else if name == "--port" {
+        match inline_value {
+          Some(value) =>
+            match parse_port(value) {
+              Some(parsed) => port = parsed
+              None => errors.push("invalid value for --port: " + value)
+            }
+          None => errors.push("missing value for --port")
+        }
+      } else {
+        errors.push("unknown option: " + name)
+      }
+      i = i + consumed
+    } else if input == "" && (command == "build" || command == "dev") {
+      input = arg
+      i = i + 1
+    } else {
+      errors.push("unexpected argument: " + arg)
+      i = i + 1
     }
   }
-  "build"
-}
-
-///|
-fn run_build(args : Array[String]) -> Unit {
-  let docs_dir = find_build_input(args)
-  let out_dir = find_option(args, "--out", "dist")
-  let base_url = find_option(args, "--base-url", "/")
-  let sources = load_sources(docs_dir)
-  let en_result = @core.build_site_for_lang(
-    sources,
-    { title: "MoonPress", description: "MoonBit documentation site", base_url },
-    "en",
-  )
-  let zh_result = @core.build_site_for_lang(
-    sources,
-    { title: "MoonPress", description: "MoonBit documentation site", base_url },
-    "zh",
-  )
-  let result = @core.merge_build_results([en_result, zh_result])
-  write_build_result(out_dir, result)
-  copy_assets(docs_dir, out_dir)
-  println("moonpress " + @core.version())
-  println("built " + result.page_count.to_string() + " pages from " + docs_dir)
-  for file in result.files {
-    println("emit " + out_dir + "/" + file.path)
+  if command == "" {
+    command = "help"
   }
-  println("copy " + docs_dir + "/assets -> " + out_dir + "/assets")
-  println("copy " + docs_dir + "/assets -> " + out_dir + "/zh/assets")
+  {
+    command,
+    input: if input == "" {
+      "docs"
+    } else {
+      input
+    },
+    out: if out == "" {
+      "dist"
+    } else {
+      out
+    },
+    base_url,
+    config_path,
+    site_url,
+    port,
+    errors,
+  }
 }
 
 ///|
-fn run_dev(args : Array[String]) -> Unit {
-  run_build(args)
-  let out_dir = find_option(args, "--out", "dist")
-  let port = parse_port(find_option(args, "--port", "8080"))
-  let base_url = find_option(args, "--base-url", "/")
-  start_preview(out_dir, port, base_url)
+fn split_option(args : Array[String], index : Int) -> (String, String?, Int) {
+  let arg = args[index]
+  match arg.find("=") {
+    Some(at) => (arg[:at].to_owned(), Some(arg[at + 1:].to_owned()), 1)
+    None =>
+      if index + 1 < args.length() && !args[index + 1].has_prefix("-") {
+        (arg, Some(args[index + 1]), 2)
+      } else {
+        (arg, None, 1)
+      }
+  }
 }
 
 ///|
-fn run_clean(args : Array[String]) -> Unit {
-  let out_dir = find_option(args, "--out", "dist")
-  clean_output_dir(out_dir)
-  println("cleaned " + out_dir)
-}
-
-///|
-fn parse_port(value : String) -> Int {
+fn parse_port(value : String) -> Int? {
+  if value == "" {
+    return None
+  }
   let mut result = 0
   for ch in value {
     if ch >= '0' && ch <= '9' {
       result = result * 10 + (ch.to_int() - '0'.to_int())
     } else {
-      return 8080
+      return None
     }
   }
-  if result == 0 {
-    8080
+  if result < 1 || result > 65535 {
+    None
   } else {
-    result
+    Some(result)
   }
 }
 
 ///|
-fn find_build_input(args : Array[String]) -> String {
-  for i = 0; i < args.length(); i = i + 1 {
-    if args[i] == "build" || args[i] == "dev" {
-      if i + 1 < args.length() && !args[i + 1].has_prefix("-") {
-        return args[i + 1]
+fn resolve_config(options : Options) -> @core.SiteConfig {
+  let path = if options.config_path == "" {
+    "moonpress.json"
+  } else {
+    options.config_path
+  }
+  let base = match read_text_file(path) {
+    Some(text) => @core.parse_config_json(text, @core.default_config())
+    None => {
+      if options.config_path != "" {
+        print_error("config file not found: " + path)
+        exit_with(1)
       }
-      return "docs"
+      @core.default_config()
     }
   }
-  "docs"
+  {
+    ..base,
+    base_url: if options.base_url == "" {
+      base.base_url
+    } else {
+      options.base_url
+    },
+    site_url: if options.site_url == "" {
+      base.site_url
+    } else {
+      options.site_url
+    },
+  }
 }
 
 ///|
-fn find_option(
-  args : Array[String],
-  name : String,
-  fallback : String,
-) -> String {
-  for i = 0; i < args.length(); i = i + 1 {
-    if args[i] == name && i + 1 < args.length() {
-      return args[i + 1]
-    }
-    let prefix = name + "="
-    if args[i].has_prefix(prefix) {
-      return args[i][prefix.length():].to_owned()
-    }
+fn run_build(options : Options) -> @core.SiteConfig {
+  let config = resolve_config(options)
+  if !dir_exists(options.input) {
+    print_error("input directory not found: " + options.input)
+    exit_with(1)
   }
-  fallback
+  let sources = load_sources(options.input)
+  if sources.length() == 0 {
+    print_error("no markdown files found in " + options.input)
+    exit_with(1)
+  }
+  let en_result = @core.build_site_for_lang(sources, config, "en")
+  let zh_result = @core.build_site_for_lang(sources, config, "zh")
+  let result = @core.merge_build_results([en_result, zh_result])
+  let changed = write_build_result(options.out, result)
+  copy_assets(options.input, options.out)
+  println("moonpress " + @core.version())
+  println(
+    "built " + result.page_count.to_string() + " pages from " + options.input,
+  )
+  for file in result.files {
+    println("emit " + options.out + "/" + file.path)
+  }
+  println("copy " + options.input + "/assets -> " + options.out + "/assets")
+  println("copy " + options.input + "/assets -> " + options.out + "/zh/assets")
+  println(
+    "changed " +
+    changed.to_string() +
+    " of " +
+    result.files.length().to_string() +
+    " files",
+  )
+  config
+}
+
+///|
+/// Rebuilds the site with exactly the flags the developer typed, so the watcher
+/// can replay the same command whenever a document changes.
+fn rebuild_command(options : Options) -> String {
+  let args : Array[String] = ["build", options.input, "--out", options.out]
+  if options.base_url != "" {
+    args.push("--base-url")
+    args.push(options.base_url)
+  }
+  if options.site_url != "" {
+    args.push("--site-url")
+    args.push(options.site_url)
+  }
+  if options.config_path != "" {
+    args.push("--config")
+    args.push(options.config_path)
+  }
+  args.join("\n")
+}
+
+///|
+fn run_dev(options : Options) -> Unit {
+  let config = run_build(options)
+  start_preview(
+    options.out,
+    options.port,
+    config.base_url,
+    options.input,
+    rebuild_command(options),
+  )
+}
+
+///|
+fn run_clean(options : Options) -> Unit {
+  clean_output_dir(options.out)
+  println("cleaned " + options.out)
 }
 
 ///|
 fn print_help() -> Unit {
   println("moonpress " + @core.version())
+  println("A static documentation site generator written in MoonBit.")
+  println("")
   println("Usage:")
-  println("  moonpress build [docs-dir] --out dist --base-url /")
-  println("  moonpress dev [docs-dir] --out dist --base-url / --port 8080")
-  println("  moonpress clean --out dist")
+  println("  moonpress build [docs-dir] [options]")
+  println("  moonpress dev   [docs-dir] [options]")
+  println("  moonpress clean [options]")
   println("  moonpress version")
+  println("")
+  println("Options:")
+  println("  --out <dir>        output directory (default: dist)")
+  println("  --base-url <path>  URL prefix for generated links (default: /)")
+  println("  --site-url <url>   absolute origin used for canonical and og tags")
+  println("  --config <file>    config file path (default: moonpress.json)")
+  println("  --port <number>    preview port for dev (default: 8080)")
+  println("  -h, --help         show this help")
+  println("  -V, --version      show the version")
 }

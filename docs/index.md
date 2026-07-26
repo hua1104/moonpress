@@ -17,3 +17,4 @@ MoonBit package authors need a lightweight way to publish tutorials, API notes, 
 - [Getting Started](guide/getting-started/)
 - [Architecture](architecture/)
 - [Configuration](configuration/)
+- [Markdown Reference](markdown/)

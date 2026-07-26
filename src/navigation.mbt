@@ -45,23 +45,74 @@ pub fn render_sidebar_for_lang(items : Array[NavItem], lang : String) -> String 
 }
 
 ///|
+/// Renders the sidebar, grouping every page that lives under a directory into a
+/// collapsible section so deep documentation trees stay readable.
 pub fn render_sidebar_with_base_url(
   items : Array[NavItem],
   lang : String,
   base_url : String,
 ) -> String {
-  let mut html = "<nav class=\"mp-sidebar\">\n"
+  let out = StringBuilder::new()
+  out.write_string("<nav class=\"mp-sidebar\">\n")
+  let mut section = ""
   for item in items {
-    html = html +
-      "  <a class=\"mp-nav-item depth-" +
+    let current = route_section(item.route)
+    if current != section {
+      if section != "" {
+        out.write_string("  </details>\n")
+      }
+      section = current
+      if section != "" {
+        out.write_string("  <details class=\"mp-nav-group\" open>\n")
+        out.write_string(
+          "    <summary class=\"mp-nav-group-title\">" +
+          escape_html(section_title(section)) +
+          "</summary>\n",
+        )
+      }
+    }
+    out.write_string(if section == "" { "  " } else { "    " })
+    out.write_string(
+      "<a class=\"mp-nav-item depth-" +
       item.depth.to_string() +
       "\" href=\"" +
       escape_html(localized_href_with_base_url(base_url, lang, item.route)) +
       "\">" +
       escape_html(item.title) +
-      "</a>\n"
+      "</a>\n",
+    )
   }
-  html + "</nav>\n"
+  if section != "" {
+    out.write_string("  </details>\n")
+  }
+  out.write_string("</nav>\n")
+  out.to_string()
+}
+
+///|
+/// Returns the first path segment of a nested route, or an empty string for
+/// top level pages.
+pub fn route_section(route : String) -> String {
+  if !route.has_prefix("/") || route == "/" {
+    return ""
+  }
+  let rest = route[1:].to_owned()
+  match rest.find("/") {
+    Some(at) => rest[:at].to_owned()
+    None => ""
+  }
+}
+
+///|
+fn section_title(section : String) -> String {
+  let cleaned = section
+    .replace_all(old="-", new=" ")
+    .replace_all(old="_", new=" ")
+  if cleaned.length() == 0 {
+    cleaned
+  } else {
+    cleaned[:1].to_owned().to_upper() + cleaned[1:].to_owned()
+  }
 }
 
 ///|
