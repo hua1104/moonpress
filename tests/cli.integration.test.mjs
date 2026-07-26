@@ -8,6 +8,7 @@ import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url));
 const cliPath = path.join(
@@ -256,6 +257,12 @@ test("CLI ships a working search bundle for each language", async () => {
   );
   assert.match(zhScript, /"\/zh\/search-index\.json"/);
 
+  const zhHtml = await readFile(
+    path.join(fixture.output, "zh", "index.html"),
+    "utf8",
+  );
+  assert.match(zhHtml, /src="\/zh\/assets\/moonpress-search\.js" defer/);
+
   const index = JSON.parse(
     await readFile(path.join(fixture.output, "search-index.json"), "utf8"),
   );
@@ -328,6 +335,112 @@ test("CLI renders the extended Markdown subset", async () => {
   );
   assert.match(html, /<sup class="mp-fn-ref" id="fnref-note">/);
   assert.match(html, /<section class="mp-footnotes">/);
+});
+
+test("CLI renders admonition containers with themed styles", async () => {
+  const fixture = await createFixture();
+  await writeFile(
+    path.join(fixture.docs, "notes.md"),
+    [
+      "---",
+      "title: Notes",
+      "order: 7",
+      "---",
+      "# Notes",
+      "",
+      "::: tip",
+      "Use moonpress.json.",
+      ":::",
+      "",
+      "::: warning 注意",
+      "Mind the base URL.",
+      ":::",
+    ].join("\n"),
+  );
+
+  runCli(["build", fixture.docs, "--out", fixture.output], {
+    cwd: fixture.root,
+  });
+  const html = await readFile(
+    path.join(fixture.output, "notes", "index.html"),
+    "utf8",
+  );
+  assert.match(html, /<aside class="mp-admonition mp-admonition-tip">/);
+  assert.match(html, /<p class="mp-admonition-title">TIP<\/p>/);
+  assert.match(html, /<aside class="mp-admonition mp-admonition-warning">/);
+  assert.match(html, /<p class="mp-admonition-title">注意<\/p>/);
+
+  const css = await readFile(
+    path.join(fixture.output, "assets", "moonpress.css"),
+    "utf8",
+  );
+  assert.match(css, /\.mp-admonition-warning/);
+  assert.match(css, /--mp-danger/);
+});
+
+test("CLI build warns about broken internal links", async () => {
+  const fixture = await createFixture();
+  await writeFile(
+    path.join(fixture.docs, "broken.md"),
+    [
+      "---",
+      "title: Broken",
+      "order: 8",
+      "---",
+      "# Broken",
+      "",
+      "[missing](./missing.md) and [ok](./index.md) and [route](/guide/start)",
+      "and `[example](/only-docs)` and [outside](https://example.com).",
+    ].join("\n"),
+  );
+
+  const result = runCli(["build", fixture.docs, "--out", fixture.output], {
+    cwd: fixture.root,
+  });
+  assert.match(result.stderr, /warning: broken\.md: broken link \.\/missing\.md/);
+  const warnings = result.stderr
+    .split("\n")
+    .filter(line => line.includes("broken link"));
+  assert.equal(warnings.length, 1, result.stderr);
+});
+
+test("search bundle tokenizes CJK queries into bigrams", async () => {
+  const fixture = await createFixture();
+  runCli(["build", fixture.docs, "--out", fixture.output], {
+    cwd: fixture.root,
+  });
+  const script = await readFile(
+    path.join(fixture.output, "assets", "moonpress-search.js"),
+    "utf8",
+  );
+
+  const sandbox = {
+    document: {
+      readyState: "loading",
+      addEventListener() {},
+      querySelector() {
+        return null;
+      },
+    },
+  };
+  vm.runInNewContext(script, sandbox);
+  const api = sandbox.__moonpressSearch;
+  assert.ok(api, "search bundle should expose its tokenizer for tests");
+
+  const tokens = query => Array.from(api.tokenize(query));
+  assert.deepEqual(tokens("配置站点"), ["配置", "置站", "站点"]);
+  assert.deepEqual(tokens("Deploy 配置"), ["deploy", "配置"]);
+  assert.deepEqual(tokens("站"), ["站"]);
+  assert.deepEqual(tokens("  spaced   words "), ["spaced", "words"]);
+
+  const entry = {
+    title: "站点配置",
+    description: "",
+    text: "如何配置站点的 base url",
+  };
+  assert.ok(api.score(entry, api.tokenize("配置站点")) > 0);
+  assert.ok(api.score(entry, api.tokenize("base 配置")) > 0);
+  assert.equal(api.score(entry, api.tokenize("不存在词")), 0);
 });
 
 test("CLI reports usage and runtime errors with distinct exit codes", async () => {

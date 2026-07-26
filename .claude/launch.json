@@ -1,0 +1,21 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "moonpress-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "_build/js/debug/build/cmd/moonpress/moonpress.js",
+        "dev",
+        "docs",
+        "--out",
+        "dist",
+        "--base-url",
+        "/",
+        "--port",
+        "8321"
+      ],
+      "port": 8321
+    }
+  ]
+}

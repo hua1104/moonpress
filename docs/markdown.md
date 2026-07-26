@@ -74,6 +74,30 @@ let greeting = "hello"
 ```
 ````
 
+## Admonitions
+
+`::: tip`, `::: note`, `::: info`, `::: warning`, `::: danger`, and `::: caution` open a highlighted container that is closed by a `:::` line. The uppercased type is the default title; any text after the type replaces it:
+
+````markdown
+::: tip
+Prefer `moonpress.json` over repeating command-line flags.
+:::
+
+::: warning Watch out
+Deploying under a sub-path requires `--base-url`.
+:::
+````
+
+The body accepts nested Markdown, including fenced code blocks — a `:::` inside a code fence does not close the container. The block above renders like this:
+
+::: tip
+Prefer `moonpress.json` over repeating command-line flags.
+:::
+
+::: warning Watch out
+Deploying under a sub-path requires `--base-url`.
+:::
+
 ## Footnotes
 
 `A claim.[^1]` references a footnote defined as `[^1]: The supporting note.` — footnotes collect at the end of the page with backlinks.

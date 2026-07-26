@@ -164,7 +164,8 @@ fn dark_theme_tokens() -> String {
   "--mp-bg:#0f171e;--mp-surface:#151f28;--mp-surface-2:#1b2732;--mp-text:#e6edf3;" +
   "--mp-muted:#9db0c0;--mp-border:#2b3a47;--mp-accent:#7cc6e8;--mp-accent-soft:#1c2c38;" +
   "--mp-strong:#cfe6f2;--mp-shadow:rgba(0,0,0,.45);" +
-  "--mp-kw:#e59ac9;--mp-str:#7fd6a8;--mp-com:#7d8f9e;--mp-num:#e7b177;--mp-fn:#8ac6f0"
+  "--mp-kw:#e59ac9;--mp-str:#7fd6a8;--mp-com:#7d8f9e;--mp-num:#e7b177;--mp-fn:#8ac6f0;" +
+  "--mp-tip:#7fd6a8;--mp-tip-soft:#152a20;--mp-warn:#e7b177;--mp-warn-soft:#2c2214;--mp-danger:#f0a49e;--mp-danger-soft:#331e1c"
 }
 
 ///|
@@ -172,7 +173,8 @@ pub fn default_stylesheet() -> String {
   ":root{--mp-bg:#f7f9fb;--mp-surface:#ffffff;--mp-surface-2:#f2f6f9;--mp-text:#17202a;" +
   "--mp-muted:#5b7284;--mp-border:#dbe4ea;--mp-accent:#075b7d;--mp-accent-soft:#eaf3f7;" +
   "--mp-strong:#0f3d5e;--mp-shadow:rgba(15,61,94,.12);" +
-  "--mp-kw:#8a2f6b;--mp-str:#0a6b4a;--mp-com:#78899a;--mp-num:#9a5b12;--mp-fn:#0f5f8f}" +
+  "--mp-kw:#8a2f6b;--mp-str:#0a6b4a;--mp-com:#78899a;--mp-num:#9a5b12;--mp-fn:#0f5f8f;" +
+  "--mp-tip:#0a6b4a;--mp-tip-soft:#e8f5ee;--mp-warn:#8a5a00;--mp-warn-soft:#faf2df;--mp-danger:#b3261e;--mp-danger-soft:#fbebe9}" +
   "@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]){" +
   dark_theme_tokens() +
   "}}" +
@@ -198,6 +200,16 @@ pub fn default_stylesheet() -> String {
   ".mp-copy:hover,.mp-copy:focus-visible{color:var(--mp-accent);border-color:var(--mp-accent)}" +
   ".mp-tok-keyword{color:var(--mp-kw)}.mp-tok-string{color:var(--mp-str)}.mp-tok-comment{color:var(--mp-com);font-style:italic}" +
   ".mp-tok-number{color:var(--mp-num)}.mp-tok-function{color:var(--mp-fn)}" +
+  ".mp-admonition{margin:20px 0;padding:12px 18px;border-left:4px solid var(--mp-accent);background:var(--mp-accent-soft)}" +
+  ".mp-admonition-title{margin:0;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:none}" +
+  ".mp-admonition>p{margin:8px 0 2px}.mp-admonition>p.mp-admonition-title{margin:0}" +
+  ".mp-admonition-tip{border-left-color:var(--mp-tip);background:var(--mp-tip-soft)}" +
+  ".mp-admonition-tip .mp-admonition-title{color:var(--mp-tip)}" +
+  ".mp-admonition-warning,.mp-admonition-caution{border-left-color:var(--mp-warn);background:var(--mp-warn-soft)}" +
+  ".mp-admonition-warning .mp-admonition-title,.mp-admonition-caution .mp-admonition-title{color:var(--mp-warn)}" +
+  ".mp-admonition-danger{border-left-color:var(--mp-danger);background:var(--mp-danger-soft)}" +
+  ".mp-admonition-danger .mp-admonition-title{color:var(--mp-danger)}" +
+  ".mp-admonition-note .mp-admonition-title,.mp-admonition-info .mp-admonition-title{color:var(--mp-accent)}" +
   ".mp-task{list-style:none;margin-left:-20px}.mp-task input{margin-right:6px}" +
   ".mp-fn-ref a{text-decoration:none}.mp-footnotes{margin-top:48px;color:var(--mp-muted);font-size:.92rem}" +
   ".mp-fn-back{margin-left:6px;text-decoration:none}" +

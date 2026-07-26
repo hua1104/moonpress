@@ -37,34 +37,90 @@ fn search_widget_script(base_url : String, lang : String) -> String {
     #|    return loading;
     #|  }
     #|
-    #|  function score(entry, query) {
-    #|    var title = (entry.title || "").toLowerCase();
-    #|    var description = (entry.description || "").toLowerCase();
-    #|    var text = (entry.text || "").toLowerCase();
-    #|    if (title.indexOf(query) === 0) return 4;
-    #|    if (title.indexOf(query) !== -1) return 3;
-    #|    if (description.indexOf(query) !== -1) return 2;
-    #|    if (text.indexOf(query) !== -1) return 1;
+    #|  function isCjk(code) {
+    #|    return (code >= 0x3400 && code <= 0x9fff) ||
+    #|      (code >= 0xf900 && code <= 0xfaff) ||
+    #|      (code >= 0x3040 && code <= 0x30ff);
+    #|  }
+    #|
+    #|  function tokenize(query) {
+    #|    var tokens = [];
+    #|    var word = "";
+    #|    var run = "";
+    #|    function flushWord() {
+    #|      if (word) { tokens.push(word); word = ""; }
+    #|    }
+    #|    function flushRun() {
+    #|      if (!run) return;
+    #|      if (run.length === 1) tokens.push(run);
+    #|      for (var i = 0; i + 1 < run.length; i++) tokens.push(run.slice(i, i + 2));
+    #|      run = "";
+    #|    }
+    #|    var lower = query.trim().toLowerCase();
+    #|    for (var i = 0; i < lower.length; i++) {
+    #|      var ch = lower[i];
+    #|      if (isCjk(lower.charCodeAt(i))) {
+    #|        flushWord();
+    #|        run += ch;
+    #|      } else if (/\s/.test(ch)) {
+    #|        flushWord();
+    #|        flushRun();
+    #|      } else {
+    #|        flushRun();
+    #|        word += ch;
+    #|      }
+    #|    }
+    #|    flushWord();
+    #|    flushRun();
+    #|    return tokens;
+    #|  }
+    #|
+    #|  function scoreToken(title, description, text, token) {
+    #|    if (title.indexOf(token) === 0) return 4;
+    #|    if (title.indexOf(token) !== -1) return 3;
+    #|    if (description.indexOf(token) !== -1) return 2;
+    #|    if (text.indexOf(token) !== -1) return 1;
     #|    return 0;
     #|  }
     #|
-    #|  function excerpt(entry, query) {
+    #|  function score(entry, tokens) {
+    #|    var title = (entry.title || "").toLowerCase();
+    #|    var description = (entry.description || "").toLowerCase();
+    #|    var text = (entry.text || "").toLowerCase();
+    #|    var total = 0;
+    #|    for (var i = 0; i < tokens.length; i++) {
+    #|      var rank = scoreToken(title, description, text, tokens[i]);
+    #|      if (rank === 0) return 0;
+    #|      total += rank;
+    #|    }
+    #|    return total;
+    #|  }
+    #|
+    #|  function excerpt(entry, tokens) {
     #|    var text = entry.text || entry.description || "";
-    #|    var at = text.toLowerCase().indexOf(query);
+    #|    var lower = text.toLowerCase();
+    #|    var at = -1;
+    #|    for (var i = 0; i < tokens.length && at === -1; i++) {
+    #|      at = lower.indexOf(tokens[i]);
+    #|    }
     #|    if (at === -1) return text.slice(0, 120);
     #|    var from = Math.max(0, at - 40);
     #|    return (from > 0 ? "\u2026" : "") + text.slice(from, from + 120);
     #|  }
     #|
     #|  function search(query) {
-    #|    var needle = query.trim().toLowerCase();
-    #|    if (!needle || !entries) return [];
+    #|    var tokens = tokenize(query);
+    #|    if (!tokens.length || !entries) return [];
     #|    return entries
-    #|      .map(function (entry) { return { entry: entry, rank: score(entry, needle) }; })
+    #|      .map(function (entry) { return { entry: entry, rank: score(entry, tokens) }; })
     #|      .filter(function (hit) { return hit.rank > 0; })
     #|      .sort(function (a, b) { return b.rank - a.rank; })
     #|      .slice(0, 10)
     #|      .map(function (hit) { return hit.entry; });
+    #|  }
+    #|
+    #|  if (typeof globalThis === "object" && globalThis) {
+    #|    globalThis.__moonpressSearch = { tokenize: tokenize, score: score };
     #|  }
     #|
     #|  function mount() {
@@ -102,7 +158,7 @@ fn search_widget_script(base_url : String, lang : String) -> String {
     #|        link.textContent = entry.title;
     #|        var snippet = document.createElement("span");
     #|        snippet.className = "mp-search-excerpt";
-    #|        snippet.textContent = excerpt(entry, query.trim().toLowerCase());
+    #|        snippet.textContent = excerpt(entry, tokenize(query));
     #|        item.appendChild(link);
     #|        item.appendChild(snippet);
     #|        list.appendChild(item);

@@ -26,6 +26,9 @@ Check the generated output:
 - All local HTML resource, navigation, language, and pager links must start with `/moonpress/`.
 - `site/feed.xml`, `site/zh/feed.xml`, `site/404.html`, and `site/zh/404.html` must exist, and the feed links must carry the same prefix.
 - A page with two or more `##` headings must contain an `mp-toc` aside; fenced code blocks must be wrapped in `mp-code` figures with highlighted spans for known languages.
+- A page containing `::: tip` must render an `mp-admonition` aside with an `mp-admonition-title` heading.
+- A link to a nonexistent `.md` file or route must print `warning: <file>: broken link <target>` to stderr during build; the build itself must still succeed.
+- Typing a two-or-more-character Chinese query into the search box of a `zh` page must return matching results (bigram tokenization).
 - Rebuilding without edits must report `changed 0 of N files`; deleting a document and rebuilding must remove its output directory.
 - `moonpress dev` must print `watching docs`, rebuild on save, and push a `moonpress-reload` event to `/__moonpress/reload` subscribers.
 - Both sitemap files must use the same prefix, and files from `docs/assets/` must exist under `site/assets/` and `site/zh/assets/`.

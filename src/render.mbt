@@ -163,9 +163,14 @@ pub fn page_shell_with_meta(
     head.write_string("  </aside>\n")
   }
   head.write_string("  </div>\n")
+  let script_path = if meta.lang == "en" {
+    "/assets/moonpress-search.js"
+  } else {
+    "/" + meta.lang + "/assets/moonpress-search.js"
+  }
   head.write_string(
     "  <script src=\"" +
-    escape_html(with_base_url(config.base_url, "/assets/moonpress-search.js")) +
+    escape_html(with_base_url(config.base_url, script_path)) +
     "\" defer></script>\n",
   )
   head.write_string("</body>\n</html>\n")

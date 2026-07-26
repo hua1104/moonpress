@@ -6,13 +6,15 @@ MoonPress is a static documentation site generator implemented in MoonBit. It sc
 
 - Renders a practical CommonMark subset: headings with permalink anchors, bold and italic text, images, ordered and nested lists, blockquotes, aligned tables, thematic breaks, and fenced code blocks with language classes.
 - GFM-style extras: strikethrough, task lists, autolinks, footnotes, and reference-style links.
+- Admonition containers (`::: tip`, `::: note`, `::: info`, `::: warning`, `::: danger`, `::: caution`) with optional custom titles and theme-aware colors.
+- Build-time dead link detection: internal `.md` and route links are validated on every build and broken ones are reported as warnings.
 - Build-time syntax highlighting for MoonBit, Rust, JavaScript, TypeScript, JSON, Bash, Python, TOML, and YAML — no runtime highlighter is shipped.
 - Code blocks with a language label, an optional `title="..."` caption, and a copy button.
 - An on-page table of contents with scroll highlighting, and a sidebar that groups pages by directory.
 - A light/dark theme switch that follows the system preference and remembers the choice.
 - Site-wide configuration through `moonpress.json`, overridable from the command line.
 - SEO metadata on every page: description, canonical URL, `hreflang` alternates, Open Graph, and Twitter card tags.
-- A dependency-free client-side search widget backed by the generated search index.
+- A dependency-free client-side search widget backed by the generated search index, with CJK bigram tokenization so Chinese queries rank properly.
 - Bilingual output with English pages at the root and Chinese pages under `zh/`.
 - `sitemap.xml`, an RSS `feed.xml`, a `404.html` page, `robots.txt`, and a build manifest for deployment.
 - Incremental rebuilds: unchanged files are not rewritten and stale files are pruned, and `dev` watches the docs, rebuilds on save, and live-reloads open preview tabs.
@@ -64,6 +66,8 @@ Generated files include:
 - English pages at the output root and Chinese pages under `zh/`.
 - `search-index.json`, `sitemap.xml`, `feed.xml`, `404.html`, `robots.txt`, and `moonpress-manifest.txt`.
 - The built-in stylesheet, the search bundle, and files copied from `docs/assets/`.
+
+During the build every internal link is validated: a `.md` link must resolve to an existing document and an absolute extensionless path must match a generated route. Broken links are printed to stderr as `warning: <file>: broken link <target>` without failing the build. External links, bare `#anchors`, asset paths, and examples inside code are skipped.
 
 ## Configure a Site
 
@@ -142,7 +146,7 @@ draft: false
 
 ## Supported Markdown
 
-Headings `#` through `######` with permalink anchors, `**bold**`, `*italic*`, `~~strikethrough~~`, inline code, backslash escapes, links, reference-style links (`[text][id]` with `[id]: url` definitions), autolinks (`<https://example.com>` and `<user@example.com>`), images, ordered and unordered lists with nesting, task lists (`- [x]`), blockquotes, tables with column alignment, thematic breaks, footnotes (`[^id]` with `[^id]: text` definitions), and fenced code blocks with an optional language and `title="..."` caption. Fenced code in MoonBit, Rust, JavaScript, TypeScript, JSON, Bash, Python, TOML, or YAML is syntax-highlighted at build time. External links receive `rel="noopener noreferrer"`. All content is HTML-escaped, so documents cannot inject markup into the generated pages.
+Headings `#` through `######` with permalink anchors, `**bold**`, `*italic*`, `~~strikethrough~~`, inline code, backslash escapes, links, reference-style links (`[text][id]` with `[id]: url` definitions), autolinks (`<https://example.com>` and `<user@example.com>`), images, ordered and unordered lists with nesting, task lists (`- [x]`), blockquotes, admonition containers (`::: tip` … `:::` with optional custom titles), tables with column alignment, thematic breaks, footnotes (`[^id]` with `[^id]: text` definitions), and fenced code blocks with an optional language and `title="..."` caption. Fenced code in MoonBit, Rust, JavaScript, TypeScript, JSON, Bash, Python, TOML, or YAML is syntax-highlighted at build time. External links receive `rel="noopener noreferrer"`. All content is HTML-escaped, so documents cannot inject markup into the generated pages.
 
 ## Quality Checks
 
@@ -159,7 +163,7 @@ moon build --target js src/cmd/moonpress
 node --test tests/cli.integration.test.mjs
 ```
 
-The MoonBit tests cover routing, front matter, Markdown rendering, configuration parsing, SEO metadata, navigation, paging, search, sitemap, build planning, and CLI argument parsing. The Node.js integration tests execute the real CLI and verify custom output directories, base URLs, configuration loading and flag precedence, SEO output, the search bundle, extended Markdown rendering, asset copying, cleaning, exit codes, and HTTP preview behavior.
+The MoonBit tests cover routing, front matter, Markdown rendering (including admonitions), internal link checking, configuration parsing, SEO metadata, navigation, paging, search, sitemap, build planning, and CLI argument parsing. The Node.js integration tests execute the real CLI and verify custom output directories, base URLs, configuration loading and flag precedence, SEO output, the search bundle and its CJK tokenizer, extended Markdown rendering, admonitions, broken link warnings, asset copying, cleaning, exit codes, and HTTP preview behavior.
 
 ## License
 

@@ -220,3 +220,45 @@ test "paragraphs are separated by blank lines" {
     ),
   )
 }
+
+///|
+test "render admonition with default title" {
+  inspect(
+    render_markdown("::: tip\nUse the config file.\n:::"),
+    content=(
+      #|<aside class="mp-admonition mp-admonition-tip">
+      #|<p class="mp-admonition-title">TIP</p>
+      #|<p>Use the config file.</p>
+      #|</aside>
+      #|
+    ),
+  )
+}
+
+///|
+test "render admonition with custom title and nested markdown" {
+  inspect(
+    render_markdown("::: warning 注意\n**不要**这样做。\n:::"),
+    content=(
+      #|<aside class="mp-admonition mp-admonition-warning">
+      #|<p class="mp-admonition-title">注意</p>
+      #|<p><strong>不要</strong>这样做。</p>
+      #|</aside>
+      #|
+    ),
+  )
+}
+
+///|
+test "admonition keeps fenced code and ignores unknown types" {
+  let html = render_markdown(
+    "::: danger\n```\n:::\n```\nstill inside\n:::\n\nafter",
+  )
+  inspect(html.find("mp-admonition-danger") is Some(_), content="true")
+  inspect(html.find("<p>still inside</p>") is Some(_), content="true")
+  inspect(html.find("<p>after</p>") is Some(_), content="true")
+  inspect(
+    render_markdown("::: custom\ntext\n:::").find("mp-admonition") is Some(_),
+    content="false",
+  )
+}

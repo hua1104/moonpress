@@ -502,7 +502,41 @@ fn is_block_start(text : String) -> Bool {
   is_thematic_break(text) ||
   is_blockquote(text) ||
   unordered_marker_width(text) > 0 ||
-  ordered_marker_width(text) > 0
+  ordered_marker_width(text) > 0 ||
+  admonition_kind(text) != ""
+}
+
+///|
+/// Returns the admonition type for a `::: tip` style container opener, or an
+/// empty string when the line does not open a known container.
+fn admonition_kind(text : String) -> String {
+  if !text.has_prefix(":::") {
+    return ""
+  }
+  let kind = first_token(text[3:].trim().to_owned()).to_lower()
+  if kind == "tip" ||
+    kind == "note" ||
+    kind == "info" ||
+    kind == "warning" ||
+    kind == "danger" ||
+    kind == "caution" {
+    kind
+  } else {
+    ""
+  }
+}
+
+///|
+/// The container title: the text after the type on the opening line, or the
+/// uppercased type when the author did not provide one.
+fn admonition_title(opener : String, kind : String) -> String {
+  let rest = opener[3:].trim().to_owned()
+  let custom = rest[kind.length():].trim().to_owned()
+  if custom == "" {
+    kind.to_upper()
+  } else {
+    custom
+  }
 }
 
 ///|
@@ -793,6 +827,8 @@ fn render_blocks(lines : Array[String], out : StringBuilder) -> Unit {
       i = i + 1
     } else if is_blockquote(text) {
       i = render_blockquote(lines, i, out)
+    } else if admonition_kind(text) != "" {
+      i = render_admonition(lines, i, out)
     } else if unordered_marker_width(text) > 0 || ordered_marker_width(text) > 0 {
       i = render_list(lines, i, out)
     } else if is_delimiter_row_at(lines, i + 1) && text.has_prefix("|") {
@@ -892,6 +928,45 @@ fn render_heading(text : String, out : StringBuilder) -> Unit {
     )
   }
   out.write_string("</" + tag + ">\n")
+}
+
+///|
+/// Renders a `::: tip` style container. The body is collected up to the
+/// closing `:::` line (fenced code inside the container is skipped over, so a
+/// `:::` inside a code sample does not close it) and rendered as nested
+/// Markdown. An unterminated container runs to the end of the document, which
+/// matches how unterminated code fences behave.
+fn render_admonition(
+  lines : Array[String],
+  start : Int,
+  out : StringBuilder,
+) -> Int {
+  let opener = lines[start].trim().to_owned()
+  let kind = admonition_kind(opener)
+  let title = admonition_title(opener, kind)
+  let inner : Array[String] = []
+  let mut fenced = false
+  let mut i = start + 1
+  while i < lines.length() {
+    let text = lines[i].trim().to_owned()
+    if text.has_prefix("```") {
+      fenced = !fenced
+    } else if !fenced && text == ":::" {
+      i = i + 1
+      break
+    }
+    inner.push(lines[i])
+    i = i + 1
+  }
+  out.write_string(
+    "<aside class=\"mp-admonition mp-admonition-" + kind + "\">\n",
+  )
+  out.write_string("<p class=\"mp-admonition-title\">")
+  out.write_string(render_inline(title))
+  out.write_string("</p>\n")
+  out.write_string(render_fragment(inner.join("\n")))
+  out.write_string("</aside>\n")
+  i
 }
 
 ///|

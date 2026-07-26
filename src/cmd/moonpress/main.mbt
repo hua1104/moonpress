@@ -209,6 +209,10 @@ fn run_build(options : Options) -> @core.SiteConfig {
     print_error("no markdown files found in " + options.input)
     exit_with(1)
   }
+  let broken = @core.check_internal_links(sources, config.base_url)
+  for message in broken {
+    print_error("warning: " + message)
+  }
   let en_result = @core.build_site_for_lang(sources, config, "en")
   let zh_result = @core.build_site_for_lang(sources, config, "zh")
   let result = @core.merge_build_results([en_result, zh_result])
